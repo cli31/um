@@ -2,6 +2,31 @@
  * made by Cheng Li
  * the implement of um_operations
  */
+#include "um_operations.h"
+
+/* parse_inst 
+ * parse through the instruction and populate opcode and regs 
+ * return the value to load (null for opcode 0-12)
+ */
+extern uint32_t parse_inst(Um_instruction *curr_inst, 
+        Um_opcode *opcode, Um_register *ra, Um_register *rb, Um_register *rc) {
+    *opcode = Bitpack_getu(*curr_inst, 4, 28);
+    assert(*opcode >= 0 && *opcode <= 13);
+
+    if (*opcode == 13) {
+        (void)rb;
+        (void)rc;
+        *ra = Bitpack_getu(*curr_inst, 3, 25);
+        /* no need to assert since 3 bits are already 0-7 */
+        return Bitpack_getu(*curr_inst, 25, 0);
+    }
+    else {
+        *ra = Bitpack_getu(*curr_inst, 3, 6);
+        *rb = Bitpack_getu(*curr_inst, 3, 3);
+        *rc = Bitpack_getu(*curr_inst, 3, 0);
+        return -1; /* indicates invalid */
+    }
+}
 
 /* opcode 0
  * Conditional Move 
@@ -20,8 +45,8 @@
  * Bitwise NAND
  * $r[A] := ¬($r[B] ∧ $r[C]);
  */
-void bitwise_NAND(Um_register a, Um_register b, Um_register c) {
-
+void bitwise_NAND(UM *um, Um_register a, Um_register b, Um_register c) {
+    um->r[a] = ~(um->r[b] & um->r[c]);
 }
 
 /*

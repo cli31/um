@@ -33,11 +33,11 @@ LDFLAGS = -g -L/comp/40/build/lib -L/usr/sup/cii40/lib64
 
 # Libraries needed for linking
 # All programs cii40 (Hanson binaries) and *may* need -lm (math)
-# 40locality and bitpack is included in um-lab
+# 40locality and bitpack (must come before other links) is included in um-lab
 # um-dis and cii contains necessary provided files 
 # cii and cii40 both exists; so both included for easier usage
 # rt is for the "real time" timing library, which contains the clock support
-LDLIBS = -l40locality -lum-dis -lcii -lcii40 -lbitpack -lm -lrt
+LDLIBS = -lbitpack -l40locality -lum-dis -lcii -lcii40 -lm -lrt
 
 # Collect all .h files in your directory.
 # This way, you can never forget to add
@@ -51,7 +51,7 @@ INCLUDES = $(shell echo *.h)
 
 ############### Rules ###############
 
-all:
+all: um
 
 ## Compile step (.c files -> .o files)
 
@@ -62,7 +62,7 @@ all:
 
 ## Linking step (.o -> executable program)
 
-# : 
+um: um.o um_operations.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 clean:

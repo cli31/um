@@ -1,6 +1,6 @@
 /* um 
  * CS 40 Assignment 6
- * Made by Spenser Rose (*UTLN*) and Cheng Li (cli31)
+ * Made by Spenser Rose (srose05) and Cheng Li (cli31)
  */
 
 /* c lib called */
@@ -9,23 +9,11 @@
 #include <stdlib.h>
 
 /* lower abstractions */
-#include <um.h>
-#include <um_operations.h>
+#include "um_operations.h"
 
-/* Hansen ADTs */
-#include <Table.h>
-
-#define UM_segments Table_T
 const int HINT = 1000; /* estimated number of segments */
 
-
-typedef struct UM {
-    uint32_t r[8]; /* 8 general-purpose registers holding 32-bit word each. */
-    UM_segments * segs; /* ptr to a Table_T where ids are key and address of
-                           memory (in 64 bits) as value */
-    // TODO IO device: gonna implement as function ptr?
-    uint32_t counter;
-} UM;
+/* struct UM is in um_operations.h */
 
 int main(int argc, char *argv[]) {
     /* Usage: ./um [file.um] */
@@ -48,7 +36,7 @@ int main(int argc, char *argv[]) {
     while (fread(buffer, sizeof(buffer), 1, fp) == 1) {
         num_of_inst++; /* first get num of insts for easier memeory alloc */
     }
-    assert(fp == EOF); /* check .um file has complete instuctions */
+    assert(feof(fp)); /* check .um file has complete instuctions */
     fclose(fp); /* re-read the file to set fp back to the beginning */
     fp = fopen(argv[1], "rb");
     if (!fp) {
@@ -62,12 +50,24 @@ int main(int argc, char *argv[]) {
 
     /* Step2: initialize um */
     UM um = {
-        .r = { 0UL } /* regs starts at all 0s*/
-        .segs = Table_new(HINT, strcmp(), void); // ? not sure the right syntax
-        .counter = 0;
+        .r = { 0UL }, /* regs starts at all 0s*/
+        .segs = NULL, /* need rvalue to lvalue transformation */
+        .counter = 0
+    };
+    UM_segments t = Table_new(HINT, NULL, NULL);
+    um.segs = &t;
+    assert(Table_put(*um.segs, &um.counter, buffer)); /* check if m[0] is null */
+
+    /* Step3: execution cycle */
+    for (; um.counter < num_of_inst; um.counter++) {
+        /* use buffer instead of Table_get for an easier expression */
+        Um_instruction curr_inst = buffer[um.counter];
+        Um_opcode opcode = 14; /* opcode from 0-13, check for valid inst */
+        Um_register ra = 8, rb = 8, rc = 8; /* reg from 0-7 */
+        uint32_t load_value = parse_inst(&curr_inst, &opcode, &ra, &rb, &rc);
+        (void)load_value;
     }
     /* all pseudo code later
-    table_put [0, buffer]
     execution cycle:
     for counter: 0 - num of inst
         access each inst and parse it: opcode, a, b, c
@@ -81,8 +81,9 @@ int main(int argc, char *argv[]) {
         for seg load:  table get key r[b], dereference and retrieve the r[c]_th word
         (use bitpack) and assign it to r[a]
 
-        for load program: // TODO
+        for load program:
     */
+
 
 
     return 0;
