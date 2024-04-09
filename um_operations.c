@@ -8,8 +8,9 @@
  * parse through the instruction and populate opcode and regs
  * return true if there is a value to load (false for opcode 0-12)
  */
-extern void parse_inst(Um_instruction *curr_inst,
-        Um_opcode *opcode, Um_register *ra, Um_register *rb, Um_register *rc) {
+extern void parse_inst(Um_instruction *curr_inst, Um_opcode *opcode, 
+                       Um_register *ra, Um_register *rb, Um_register *rc) 
+{
     *opcode = Bitpack_getu(*curr_inst, 4, 28);
     assert(*opcode >= 0 && *opcode <= 13);
 
@@ -27,87 +28,76 @@ extern void parse_inst(Um_instruction *curr_inst,
     }
 }
 
-
 /* opcode 0
  * Conditional Move
  * if $r[C]= 0 then $r[A] := $r[B]
  */
-void execute_cmov(uint32_t* regs, uint32_t ra, uint32_t rb, uint32_t rc)
+void conditional_move(UM *um, Um_register ra, Um_register rb, Um_register rc)
 {
-    if (regs[rc] != 0) {
-        regs[ra] = regs[rb];
+    if (um->r[rc] != 0) {
+        um->r[ra] = um->r[rb];
     }
 }
 
-//what type should segment be?
-Umsegment_T* segment(int n)
-{
-    if (n == 0) {
-        return //?
-    } else {
-        return return_id(amap, n);
-    }
-}
 /* opcode 1
  * Segmented Load
  * $r[A] := $m[$r[B]][$r[C]]
  */
 // TODO: not now since details abt segment memory not settled
-void execute_sload(uint32_t ra, uint32_t rb, uint32_t rc)
+void sload(Um_register ra, Um_register rb, Um_register rc)
 {
-    ra = segment(rb)[rc];
+    r->ra = segment(r->rb)[r->rc];
 }
 
-// Function to perform the SSTORE operation
-void execute_sstore(uint32_t ra, uint32_t rb, uint32_t rc)
+/* opcode 2
+ * Segmented Store
+ */
+void sstore(Um_register ra, Um_register rb, Um_register rc)
 {
-    segment(ra)[rb] = rc;
+    segment(ra)[rb] = r->rc;
 }
 
 
 /* opcode 3
  * Addition
- *
+ * $r[A] := ($r[B] + $r[C]) mod 2^32
  */
-void execute_add(uint32_t* regs, uint32_t ra, uint32_t rb, uint32_t rc)
+void addition(UM *um, Um_register ra, Um_register rb, Um_register rc)
 {
-        regs[ra] = (regs[rb] + regs[rc]) % UINT32_MAX;
+    um->r[ra] = um->r[rb] + um->r[rc];
 }
-
-
 
  /* opcode 4
  * Multiplication
- *
+ * $r[A] := ($r[B] × $r[C]) mod 2^32
  */
-void execute_mult(uint32_t* regs, uint32_t ra, uint32_t rb, uint32_t rc)
+void multiplication(UM *um, Um_register ra, Um_register rb, Um_register rc)
 {
-        regs[ra] = (uint64_t)regs[rb] * (uint64_t)regs[rc] % UINT32_MAX;
+        // ?
+        um->r[ra] = ((uint64_t)um->r[rb] * (uint64_t)um->r[rc]) % UINT32_MAX;
 }
 
 
  /* opcode 5
  * Division
- *
+ * $r[A] := ⌊$r[B] ÷ $r[C]⌋
  */
-void execute_div(uint32_t* regs, uint32_t ra, uint32_t rb, uint32_t rc)
+void division(UM *um, Um_register ra, Um_register rb, Um_register rc)
 {
-        if (regs[rc] == 0) {
+        if (um->r[rc] == 0) {
         // Division by zero error handling.
-        fprintf(stderr, "Did you really try to divide by 0 :(\n");
-        EXIT(1);
-        return;
+            fprintf(stderr, "Did you really try to divide by 0 :(\n");
+            return;
         }
-        regs[ra] = regs[rb] / regs[rc];
+        um->r[ra] = um->r[rb] / um->r[rc];
 }
-
-
 
 /* opcode 6
  * Bitwise NAND
  * $r[A] := ¬($r[B] ∧ $r[C]);
  */
-void bitwise_NAND(UM *um, Um_register a, Um_register b, Um_register c) {
+void bitwise_NAND(UM *um, Um_register a, Um_register b, Um_register c) 
+{
     um->r[a] = ~(um->r[b] & um->r[c]);
 }
 
@@ -116,8 +106,7 @@ void bitwise_NAND(UM *um, Um_register a, Um_register b, Um_register c) {
  * Halt
  * Computation stops
  */
-void Halt(void) {
-
+void halt(void) {
 }
 
 /*
@@ -126,8 +115,10 @@ void Halt(void) {
  * The value in $r[C] is written to the I/O device immediately. Only values
  * from 0 to 255 are allowed.
  */
-void output(Um_register c) {
-
+void output(UM *um, Um_register c) 
+{
+    assert (um->r[c] <= 255);
+    putchar(um->r[c]);
 }
 
 /* opcode 11
@@ -137,14 +128,43 @@ void output(Um_register c) {
  * end of input has been signaled, then $r[C] is loaded with a full 32-bit
  * word in which every bit is 1.
  */
-void input(Um_register c) {
-
+void input(UM *um, Um_register c) 
+{
+    uint32_t input = fgetc(stdin); // ?
+    if (input != EOF) {
+        assert(input <= 255);
+        um->r[c] = input;
+    }
+    else {
+        um->r[c] = -1;
+    }
 }
+
+/*
+ * opcode 12
+ * Load Program
+ * Segment $m[$r[B]] is duplicated, and the duplicate replaces $m[0], which is
+ * abandoned. The program counter is set to point to $m[0][$r[C]]. If $r[B] = 0,
+ * the load-program operation is expected to be extremely quick.
+ */
+ void load_program(UM *um, Um_register b, Um_register c) 
+ {
+    if (um->r[b] == 0) {
+        return; /* do nothing == extremely quick */
+    }
+    void *t = Table_get(*(um->segs), um->r[b]);
+    assert(t != NULL); /* check $m[$r[b]] is mapped */
+    uint32_t value = (uint32_t)(uintptr_t)t; /* convert t */
+    
+    /* $m[$r[b]] is duplicated instead of redirected */
+
+ }
 
 /* opcode 13
  * Load Value
  * sets $r[A] to the value (lsb 25 bits in instructions)
  */
-void load_value(Um_register a) {
-
+void load_value(UM *um, Um_register a, uint32_t value) 
+{
+    um->r[a] = value;
 }

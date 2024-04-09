@@ -53,11 +53,16 @@ int main(int argc, char *argv[]) {
     UM um = {
         .r = { 0UL }, /* regs starts at all 0s */
         .segs = NULL, /* rvalue to lvalue need to be done outside */
-        .counter = 0
+        .counter = 0,
+        .reuse_id = NULL
     };
     UM_segments t = Table_new(HINT, NULL, NULL);
     um.segs = &t;
-    assert(Table_put(*um.segs, &um.counter, buffer)); /* check m[0] was null */
+    assert(Table_put(*um.segs, (void *)(uintptr_t)um.counter,
+                               (void *)(uintptr_t)buffer)); /* m[0] != null */
+                               /* buffer was treated as a 64-bit int */
+    Seq_T t = Seq_new(HINT);
+    um.reuse_id = &t;
 
     /* Step3: execution cycle */
     for (; um.counter < num_of_inst; um.counter++) {
@@ -68,30 +73,54 @@ int main(int argc, char *argv[]) {
         parse_inst(&curr_inst, &opcode, &ra, &rb, &rc);
         switch (opcode) {
             case CMOV:
+                conditional_move(&um, ra, rb, rc);
                 break;
-            
+            case SLOAD:
+                break;
+            case SSTORE:
+                break;
+            case ADD:
+                addition(&um, ra, rb, rc);
+                break;
+            case MUL:
+                multiplication(&um, ra, rb, rc);
+                break;
+            case DIV:
+                division(&um, ra, rb, rc);
+                break;
+            case NAND:
+                bitwise_NAND(&um, ra, rb, rc);
+                break;
+            case HALT:
+                halt();
+                break;
+            case ACTIVATE:
+
+                break;
+            case INACTIVATE:
+                break;
+            case OUT:
+                ouput(&um, rc);
+                break;
+            case IN:
+                input(&um, rc);
+                break;
+            case LOADP:
+                /* since in the beginning of func cycle, we chose to use buffer 
+                instead of table get $m[0] */
+                /* need to update buffer and num_of_inst */
+                break;
+            case LV:
+                uint32_t value = Bitpack_getu(curr_inst, 25, 0);
+                load_value(&um, ra, value);
+                break;
             default:
         }
-        
+
     }
-    /* all pseudo code later
-    execution cycle:
-    for counter: 0 - num of inst
-        access each inst and parse it: opcode, a, b, c
-        switch case 0-13: // ? we can pass the um in so regs and segs can be accessed, should we do that?
-        for seg map: create a new ptr and alloc r[c] of 32 bits, table
-            put [r[b], ptr] (remember to check run-time error);
-        for seg ummap: table remove r[c]. push id (r[c]) to seq. // ? I still did not figure out how to reuse the id if alloc'ed memory is not always the same
 
-        for seg store: table get key r[a], dereference and replace the r[b]_th word 
-        with r[c] (use bitpack) table put the new value back
-        for seg load:  table get key r[b], dereference and retrieve the r[c]_th word
-        (use bitpack) and assign it to r[a]
-
-        for load program:
-    */
-
-
+    /* free everything */
+    
 
     return 0;
 }
