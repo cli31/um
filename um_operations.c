@@ -6,9 +6,9 @@
 
 /* parse_inst 
  * parse through the instruction and populate opcode and regs 
- * return the value to load (null for opcode 0-12)
+ * return true if there is a value to load (false for opcode 0-12)
  */
-extern uint32_t parse_inst(Um_instruction *curr_inst, 
+extern void parse_inst(Um_instruction *curr_inst, 
         Um_opcode *opcode, Um_register *ra, Um_register *rb, Um_register *rc) {
     *opcode = Bitpack_getu(*curr_inst, 4, 28);
     assert(*opcode >= 0 && *opcode <= 13);
@@ -18,13 +18,12 @@ extern uint32_t parse_inst(Um_instruction *curr_inst,
         (void)rc;
         *ra = Bitpack_getu(*curr_inst, 3, 25);
         /* no need to assert since 3 bits are already 0-7 */
-        return Bitpack_getu(*curr_inst, 25, 0);
+        /* value will be parsed */
     }
     else {
         *ra = Bitpack_getu(*curr_inst, 3, 6);
         *rb = Bitpack_getu(*curr_inst, 3, 3);
         *rc = Bitpack_getu(*curr_inst, 3, 0);
-        return -1; /* indicates invalid */
     }
 }
 

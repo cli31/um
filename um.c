@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* template done, code starts here */
+    /* it is an oop idea, code inside of this block is equivalent to um.run() */
     /* Step1: read in instructions from fp */
     uint32_t *buffer = (uint32_t *)malloc(sizeof(uint32_t));
     size_t   num_of_inst = 0;
@@ -50,22 +51,28 @@ int main(int argc, char *argv[]) {
 
     /* Step2: initialize um */
     UM um = {
-        .r = { 0UL }, /* regs starts at all 0s*/
-        .segs = NULL, /* need rvalue to lvalue transformation */
+        .r = { 0UL }, /* regs starts at all 0s */
+        .segs = NULL, /* rvalue to lvalue need to be done outside */
         .counter = 0
     };
     UM_segments t = Table_new(HINT, NULL, NULL);
     um.segs = &t;
-    assert(Table_put(*um.segs, &um.counter, buffer)); /* check if m[0] is null */
+    assert(Table_put(*um.segs, &um.counter, buffer)); /* check m[0] was null */
 
     /* Step3: execution cycle */
     for (; um.counter < num_of_inst; um.counter++) {
-        /* use buffer instead of Table_get for an easier expression */
+        /* use buffer instead of Table_get for a simpler expression */
         Um_instruction curr_inst = buffer[um.counter];
         Um_opcode opcode = 14; /* opcode from 0-13, check for valid inst */
         Um_register ra = 8, rb = 8, rc = 8; /* reg from 0-7 */
-        uint32_t load_value = parse_inst(&curr_inst, &opcode, &ra, &rb, &rc);
-        (void)load_value;
+        parse_inst(&curr_inst, &opcode, &ra, &rb, &rc);
+        switch (opcode) {
+            case CMOV:
+                break;
+            
+            default:
+        }
+        
     }
     /* all pseudo code later
     execution cycle:
