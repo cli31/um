@@ -6,10 +6,9 @@
  *  CS 40 HW 6: UM
  *
  *  Implementation of um_operations, defining the set of operations
- *  for the Universal Machine (UM). Includes functions for executing
- *  each operation defined in the UM's instruction set, ranging from
- *  conditional move to program loading and input/output handling.
- *
+ *  for the UM. Includes functions for executing each operation defined in the
+ *  UM's instruction set, ranging from conditional move to program loading and
+ *  input/output handling.
  ******************************************************************/
 #include "um_operations.h"
 
