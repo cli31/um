@@ -1,14 +1,35 @@
-/*
- * um_operations.h
- * made by Cheng Li
- * the interface of operations 0 - 13
- */
+/******************************************************************
+ *  um_operations.h
+ *  Spencer Rose (srose05) and Cheng Li (cli31)
+ *  Date last edited: 4/11/24
+ *
+ *  CS 40 HW 6: UM
+ *
+ *  Header file defining the operations for the UM.The UM operations manipulate
+ *  registers and memory segments according to the instructions encoded in UM
+ *  programs, facilitating the execution of a wide range of computations and
+ *  I/O interactions.
+ ******************************************************************/
 #include <stdbool.h>
 #include <table.h>
 #include <seq.h>
 #include <bitpack.h>
 #include <assert.h>
 
+/********** Um_instruction **********
+ * Represents an instruction in the Universal Machine, including opcode and
+ * operand(s).
+ *
+ * Members:
+ *      Um_opcode opcode: The operation code indicating the instruction type.
+ *      Um_register ra, rb, rc: Operand registers, usage varies by instruction.
+ *      uint32_t value: Immediate value for certain instructions (e.g. Load)
+ *
+ * Description:
+ *      This structure encapsulates a single instruction's data, including the
+ *      operation to perform and the operands on which to perform it. It is
+ *      parsed to execute the corresponding action in the UM.
+ ******************************/
 typedef uint32_t Um_instruction;
 typedef enum Um_opcode {
         CMOV = 0, SLOAD, SSTORE, ADD, MUL, DIV,
@@ -27,7 +48,7 @@ typedef struct UM {
 } UM;
 
 typedef enum Um_register { r0 = 0, r1, r2, r3, r4, r5, r6, r7 } Um_register;
-extern bool parse_inst(Um_instruction *curr_inst, 
+extern bool parse_inst(Um_instruction *curr_inst,
         Um_opcode *opcode, Um_register *ra, Um_register *rb, Um_register *rc);
 
 void conditional_move(UM *um, Um_register ra, Um_register rb, Um_register rc);
