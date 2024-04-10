@@ -109,6 +109,20 @@ void bitwise_NAND(UM *um, Um_register a, Um_register b, Um_register c)
 void halt(void) {
 }
 
+/* 
+ * opcode 8
+ * Map Segment
+ * A new segment is created with a number of words equal to the value in $r[C].
+ * Each word in the new segment is initialized to 0. A bit pattern that is not
+ * all zeroes and that does not identify any currently mapped segment is placed
+ * in $r[B]. The new segment is mapped as $m[$r[B]].
+ */
+void map_segment(UM *um, Um_register b, Um_register c) {
+    assert(Table_get(*(um->segs), um->r[b]) != NULL);
+    
+
+}
+
 /*
  * opcode 10
  * Output
@@ -147,8 +161,8 @@ void input(UM *um, Um_register c)
  * abandoned. The program counter is set to point to $m[0][$r[C]]. If $r[B] = 0,
  * the load-program operation is expected to be extremely quick.
  */
- void load_program(UM *um, Um_register b, Um_register c) 
- {
+void load_program(UM *um, Um_register b, Um_register c) 
+{
     if (um->r[b] == 0) {
         return; /* do nothing == extremely quick */
     }
@@ -158,7 +172,7 @@ void input(UM *um, Um_register c)
     
     /* $m[$r[b]] is duplicated instead of redirected */
 
- }
+}
 
 /* opcode 13
  * Load Value
