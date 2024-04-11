@@ -113,7 +113,8 @@ void addition(UM *um, Um_register ra, Um_register rb, Um_register rc)
  ******************************/
 void multiplication(UM *um, Um_register ra, Um_register rb, Um_register rc)
 {
-        um->r[ra] = ((uint64_t)um->r[rb] * (uint64_t)um->r[rc]) % UINT32_MAX;
+        um->r[ra] = ((uint64_t)um->r[rb] * (uint64_t)um->r[rc]) 
+                    & ((uint32_t)-1);
 }
 
 
