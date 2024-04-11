@@ -13,10 +13,10 @@
 #ifndef UM_OPERATIONS_H
 #define UM_OPERATIONS_H
 
-#include <stdbool.h>
+#include <stdint.h>
 #include <bitpack.h>
 #include <assert.h>
-#include <um_components.h>
+#include "um_components.h"
 
 /********** Um_instruction **********
  * Represents an instruction in the Universal Machine, including opcode and
@@ -38,20 +38,19 @@ typedef enum Um_opcode {
         NAND, HALT, ACTIVATE, INACTIVATE, OUT, IN, LOADP, LV
 } Um_opcode;
 
-
-
 typedef enum Um_register { r0 = 0, r1, r2, r3, r4, r5, r6, r7 } Um_register;
 extern bool parse_inst(Um_instruction *curr_inst,
         Um_opcode *opcode, Um_register *ra, Um_register *rb, Um_register *rc);
-
 void conditional_move(UM *um, Um_register ra, Um_register rb, Um_register rc);
-void sload(Um_register ra, Um_register rb, Um_register rc);
-void sstore(Um_register ra, Um_register rb, Um_register rc);
+void segmented_load(UM *um, Um_register ra, Um_register rb, Um_register rc);
+void segmented_store(UM *um, Um_register ra, Um_register rb, Um_register rc);
 void addition(UM *um, Um_register ra, Um_register rb, Um_register rc);
 void multiplication(UM *um, Um_register ra, Um_register rb, Um_register rc);
 void division(UM *um, Um_register ra, Um_register rb, Um_register rc);
-extern void bitwise_NAND(UM *um, Um_register a, Um_register b, Um_register c);
+void bitwise_NAND(UM *um, Um_register a, Um_register b, Um_register c);
 void halt(void);
+void map_segment(UM *um, Um_register b, Um_register c);
+void unmap_segment(UM *um, Um_register c);
 void output(UM *um, Um_register c);
 void input(UM *um, Um_register c);
 void load_program(UM *um, Um_register b, Um_register c);

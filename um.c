@@ -5,8 +5,6 @@
 
 /* c lib called */
 #include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
 
 /* lower abstractions */
 #include "um_operations.h"
@@ -44,23 +42,28 @@ int main(int argc, char *argv[]) {
                 argv[argc - 1]);
         exit(EXIT_FAILURE);
     }
-    buffer = realloc(buffer, sizeof(uint32_t) * num_of_inst);
-    fread(buffer, sizeof(buffer), 1, fp);
+    /* put size at the very front */
+    buffer = (uint32_t *)realloc(buffer, sizeof(uint32_t) * (num_of_inst + 1));
+    if (!buffer) {
+        fprintf(stderr, "Error: Memory reallocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    buffer[0] = num_of_inst;
+    fread(buffer + 1, sizeof(buffer), num_of_inst, fp);
+    fclose(fp);
 
     /* Step2: initialize um */
     UM um;
-    UM_segments t = Table_new(HINT, NULL, NULL);
-    um.segs = &t;
+    initialize_UM(&um);
+    /* check $m[0] is loaded with program */
     assert(Table_put(*um.segs, (void *)(uintptr_t)um.counter,
-                               (void *)(uintptr_t)buffer)); /* m[0] != null */
-                               /* buffer was treated as a 64-bit int */
-    Seq_T t = Seq_new(HINT);
-    um.reuse_id = &t;
+                               (void *)(uintptr_t)buffer) != NULL);
 
     /* Step3: execution cycle */
     for (; um.counter < num_of_inst; um.counter++) {
         /* use buffer instead of Table_get for a simpler expression */
-        Um_instruction curr_inst = *(buffer + um.counter);
+        /* reset of program ptr was done in load program block */
+        Um_instruction curr_inst = buffer[um.counter + 1];
         Um_opcode opcode = 14; /* opcode from 0-13, check for valid inst */
         Um_register ra = 8, rb = 8, rc = 8; /* reg from 0-7 */
         parse_inst(&curr_inst, &opcode, &ra, &rb, &rc);
@@ -69,8 +72,10 @@ int main(int argc, char *argv[]) {
                 conditional_move(&um, ra, rb, rc);
                 break;
             case SLOAD:
+                segmented_load(&um, ra, rb, rc);
                 break;
             case SSTORE:
+                segmented_store(&um, ra, rb, rc);
                 break;
             case ADD:
                 addition(&um, ra, rb, rc);
@@ -88,9 +93,10 @@ int main(int argc, char *argv[]) {
                 halt();
                 break;
             case ACTIVATE:
-
+                map_segment(&um, rb, rc);
                 break;
             case INACTIVATE:
+                unmap_segment(&um, rc);
                 break;
             case OUT:
                 ouput(&um, rc);
@@ -100,8 +106,11 @@ int main(int argc, char *argv[]) {
                 break;
             case LOADP:
                 /* since in the beginning of func cycle, we chose to use buffer 
-                instead of table get $m[0] */
-                /* need to update buffer and num_of_inst */
+                instead of running Table_get $m[0], we need to update buffer and 
+                num_of_inst after $m[0] was replaced in load program */
+                load_program(&um, rb, rc);
+                /* the old $m[0] should've been properly freed */
+                buffer = Table_get(um.segs.mem_space, (void *)(uintptr_t)0);
                 break;
             case LV:
                 uint32_t value = Bitpack_getu(curr_inst, 25, 0);
@@ -109,11 +118,11 @@ int main(int argc, char *argv[]) {
                 break;
             default:
         }
-
     }
 
     /* free everything */
-    
+    Table_free(&um.segs.mem_space);
+    Seq_free  (&um.segs.ummapped_ids);
 
     return 0;
 }

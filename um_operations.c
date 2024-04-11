@@ -81,18 +81,26 @@ void conditional_move(UM *um, Um_register ra, Um_register rb, Um_register rc)
  * Segmented Load
  * $r[A] := $m[$r[B]][$r[C]]
  */
-// TODO: not now since details abt segment memory not settled
-void sload(Um_register ra, Um_register rb, Um_register rc)
+void segmented_load(UM *um, Um_register ra, Um_register rb, Um_register rc);
 {
-    r->ra = segment(r->rb)[r->rc];
+    /* retrieve the segment with id $r[b] */
+    uint32_t *curr_seg = (uint32_t *)Table_get(um->segs.mem_space, 
+                                               (void *)(uintptr_t)um->r[rb]);
+    assert(curr_seg != NULL);
+    assert(um->r[rc] < curr_seg[0]); /* check in the range */
+    um->r[ra] = curr_seg[rc + 1]; /* size takes the 0 idx */ 
 }
 
 /* opcode 2
  * Segmented Store
  */
-void sstore(Um_register ra, Um_register rb, Um_register rc)
+void segmented_store(UM *um, Um_register ra, Um_register rb, Um_register rc);
 {
-    segment(ra)[rb] = r->rc;
+    uint32_t *curr_seg = (uint32_t *)Table_get(um->segs.mem_space, 
+                                               (void *)(uintptr_t)um->r[ra]);
+    assert(curr_seg != NULL);
+    assert(um->r[rb] < curr_seg[0]); /* check in the range */
+    curr_seg[rb + 1] = um->r[rc];
 }
 
 
@@ -144,7 +152,6 @@ void addition(UM *um, Um_register ra, Um_register rb, Um_register rc)
  ******************************/
 void multiplication(UM *um, Um_register ra, Um_register rb, Um_register rc)
 {
-        // ?
         um->r[ra] = ((uint64_t)um->r[rb] * (uint64_t)um->r[rc]) % UINT32_MAX;
 }
 
@@ -226,6 +233,45 @@ void bitwise_NAND(UM *um, Um_register a, Um_register b, Um_register c)
 void halt(void) {
 }
 
+/* opcode 8
+ * map segment
+ * 
+ */
+void map_segment(UM *um, Um_register b, Um_register c) {
+    /* create a new segment */
+    uint32_t *new_seg;
+    /* if there is no available id */
+    if (Seq_length(um->segs.unmapped_ids) == 0) {
+        new_seg = (uint32_t *)malloc(sizeof(uint32_t) * (um->r[c] + 1));
+    }
+    else {
+        /* use from high end like a stack */
+        new_seg = Seq_remhi(um->segs.ummaped_ids);
+        new_seg = (uint32_t *)realloc(new_seg, sizeof(uint32_t)*(um->r[c] + 1));
+    }
+    new_seg[0] = um->r[c]; /* set the first word as size */
+    /* initialize each word to 0 */
+    for (int i = 1; i < um->r[c] + 1; i++) {
+        new_seg[i] = 0;
+    }
+    /* add the seg and id, while make sure it's a new id */
+    assert(Table_put(um->segs.mem_space, 
+                     (void *)(uintptr_t)um->r[b], 
+                     (void *)(uintptr_t)new_seg) == NULL);
+}
+
+/* opcode 9
+ * ummap segment 
+ */
+void unmap_segment(UM *um, Um_register c) {
+    /* unmap from the table, while check the id exists */
+    assert(Table_remove(um->segs.mem_space, (void *)(uintptr_t)um->r[c])
+                                                                    != NULL);
+    /* push the id to reusable seq */
+    Seq_addhi(um->segs.unmapped_ids, (void *)(uintptr_t)um->r[c]);
+    /* does not free memeory so that the address can be reused by realloc */
+}
+
 /********** output **********
  * Outputs the value in a register to the I/O device, which must be in the
  * range 0 to 255.
@@ -270,7 +316,7 @@ void output(UM *um, Um_register c)
  ******************************/
 void input(UM *um, Um_register c)
 {
-    uint32_t input = fgetc(stdin); // ?
+    uint32_t input = fgetc(stdin);
     if (input != EOF) {
         assert(input <= 255);
         um->r[c] = input;
@@ -313,12 +359,21 @@ void input(UM *um, Um_register c)
     if (um->r[b] == 0) {
         return; /* do nothing == extremely quick */
     }
-    void *t = Table_get(*(um->segs), um->r[b]);
-    assert(t != NULL); /* check $m[$r[b]] is mapped */
-    uint32_t value = (uint32_t)(uintptr_t)t; /* convert t */
-
-    /* $m[$r[b]] is duplicated instead of redirected */
-
+    /* get $m($r[b]) */
+    uint32_t *this_seg = (uint32_t *)Table_get(um->segs.mem_space,
+                                               (void *)(uintptr_t)um->r[b]);
+    assert(this_seg != NULL);
+    /* free $m[0] */
+    free((uint32_t *)Table_get(um->segs.mem_space, (void *)(uintptr_t)0));
+    /* duplicate */
+    uint32_t size = this_seg[0];
+    uint32_t *new_seg = (uint32_t *)malloc(sizeof(uint32_t) * (size + 1));
+    memcpy(new_seg, this_seg, sizeof(uint32_t) * (size + 1));
+    /* the duplicate replace $m[0] */
+    Table_put(um->segs.mem_space, (void *)(uintptr_t)0, 
+                                  (void *)(uintptr_t)new_seg);
+    /* update the counter to $r[c] */
+    assert(um->counter = um->r[c] <= size);
  }
 
 /********** load_value **********
