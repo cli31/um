@@ -10,11 +10,13 @@
  *  programs, facilitating the execution of a wide range of computations and
  *  I/O interactions.
  ******************************************************************/
+#ifndef UM_OPERATIONS_H
+#define UM_OPERATIONS_H
+
 #include <stdbool.h>
-#include <table.h>
-#include <seq.h>
 #include <bitpack.h>
 #include <assert.h>
+#include <um_components.h>
 
 /********** Um_instruction **********
  * Represents an instruction in the Universal Machine, including opcode and
@@ -36,16 +38,7 @@ typedef enum Um_opcode {
         NAND, HALT, ACTIVATE, INACTIVATE, OUT, IN, LOADP, LV
 } Um_opcode;
 
-typedef Table_T UM_segments;
 
-typedef struct UM {
-        uint32_t r[8]; /* 8 general-purpose registers holding 32-bit word each. */
-        UM_segments *segs; /* ptr to a Table_T where ids are key and address of
-                              memory (in 64 bits) as value */
-        // ? IO device: gonna implement as function ptr?
-        uint32_t counter;
-        Seq_T *reuse_id;
-} UM;
 
 typedef enum Um_register { r0 = 0, r1, r2, r3, r4, r5, r6, r7 } Um_register;
 extern bool parse_inst(Um_instruction *curr_inst,
@@ -63,3 +56,5 @@ void output(UM *um, Um_register c);
 void input(UM *um, Um_register c);
 void load_program(UM *um, Um_register b, Um_register c);
 void load_value(UM *um, Um_register a, uint32_t value);
+
+#undef UM_OPERATIONS_H
