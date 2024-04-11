@@ -59,10 +59,9 @@ all: um
 %.o: %.c $(INCLUDES)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-
 ## Linking step (.o -> executable program)
 
-um: um.o um_operations.o
+um: um.o um_operations.o um_components.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 clean:

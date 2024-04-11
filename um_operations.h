@@ -13,9 +13,6 @@
 #ifndef UM_OPERATIONS_H
 #define UM_OPERATIONS_H
 
-#include <stdint.h>
-#include <bitpack.h>
-#include <assert.h>
 #include "um_components.h"
 
 /********** Um_instruction **********
@@ -32,15 +29,6 @@
  *      operation to perform and the operands on which to perform it. It is
  *      parsed to execute the corresponding action in the UM.
  ******************************/
-typedef uint32_t Um_instruction;
-typedef enum Um_opcode {
-        CMOV = 0, SLOAD, SSTORE, ADD, MUL, DIV,
-        NAND, HALT, ACTIVATE, INACTIVATE, OUT, IN, LOADP, LV
-} Um_opcode;
-
-typedef enum Um_register { r0 = 0, r1, r2, r3, r4, r5, r6, r7 } Um_register;
-extern bool parse_inst(Um_instruction *curr_inst,
-        Um_opcode *opcode, Um_register *ra, Um_register *rb, Um_register *rc);
 void conditional_move(UM *um, Um_register ra, Um_register rb, Um_register rc);
 void segmented_load(UM *um, Um_register ra, Um_register rb, Um_register rc);
 void segmented_store(UM *um, Um_register ra, Um_register rb, Um_register rc);
@@ -56,4 +44,4 @@ void input(UM *um, Um_register c);
 void load_program(UM *um, Um_register b, Um_register c);
 void load_value(UM *um, Um_register a, uint32_t value);
 
-#undef UM_OPERATIONS_H
+#endif

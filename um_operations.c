@@ -12,45 +12,6 @@
  ******************************************************************/
 #include "um_operations.h"
 
-/********** parse_inst **********
- * Parses an instruction and populates opcode and register operands.
- *
- * Parameters:
- *      Um_instruction *curr_inst: Pointer to the current instruction to parse.
- *      Um_opcode *opcode: Pointer to store the parsed opcode.
- *      Um_register *ra, *rb, *rc: Pointers to store parsed register operands.
- *
- * Return:
- *      void
- *
- * Expects:
- *      - curr_inst, opcode, ra, rb, and rc are not NULL.
- *      - curr_inst points to a valid instruction.
- *
- * Effects:
- *      - Extracts the opcode and registers from curr_inst.
- *      - Populates opcode, ra, rb, and rc with the extracted values.
- ******************************/
-extern void parse_inst(Um_instruction *curr_inst, Um_opcode *opcode,
-                       Um_register *ra, Um_register *rb, Um_register *rc)
-{
-    *opcode = Bitpack_getu(*curr_inst, 4, 28);
-    assert(*opcode >= 0 && *opcode <= 13);
-
-    if (*opcode == 13) {
-        (void)rb;
-        (void)rc;
-        *ra = Bitpack_getu(*curr_inst, 3, 25);
-        /* no need to assert since 3 bits are already 0-7 */
-        /* value will be parsed */
-    }
-    else {
-        *ra = Bitpack_getu(*curr_inst, 3, 6);
-        *rb = Bitpack_getu(*curr_inst, 3, 3);
-        *rc = Bitpack_getu(*curr_inst, 3, 0);
-    }
-}
-
 /********** conditional_move **********
  * Performs the Conditional Move operation.
  * If the value in register rc is not zero, the value in register rb is copied
@@ -81,7 +42,7 @@ void conditional_move(UM *um, Um_register ra, Um_register rb, Um_register rc)
  * Segmented Load
  * $r[A] := $m[$r[B]][$r[C]]
  */
-void segmented_load(UM *um, Um_register ra, Um_register rb, Um_register rc);
+void segmented_load(UM *um, Um_register ra, Um_register rb, Um_register rc)
 {
     /* retrieve the segment with id $r[b] */
     uint32_t *curr_seg = (uint32_t *)Table_get(um->segs.mem_space, 
@@ -94,7 +55,7 @@ void segmented_load(UM *um, Um_register ra, Um_register rb, Um_register rc);
 /* opcode 2
  * Segmented Store
  */
-void segmented_store(UM *um, Um_register ra, Um_register rb, Um_register rc);
+void segmented_store(UM *um, Um_register ra, Um_register rb, Um_register rc)
 {
     uint32_t *curr_seg = (uint32_t *)Table_get(um->segs.mem_space, 
                                                (void *)(uintptr_t)um->r[ra]);
@@ -239,36 +200,42 @@ void halt(void) {
  */
 void map_segment(UM *um, Um_register b, Um_register c) {
     /* create a new segment */
-    uint32_t *new_seg;
-    /* if there is no available id */
+    uint32_t *seg;
+    /* if there is no available id, alloc a new memory segment */
     if (Seq_length(um->segs.unmapped_ids) == 0) {
-        new_seg = (uint32_t *)malloc(sizeof(uint32_t) * (um->r[c] + 1));
+        seg = (uint32_t *)malloc(sizeof(uint32_t) * (um->r[c] + 1));
     }
     else {
         /* use from high end like a stack */
-        new_seg = Seq_remhi(um->segs.ummaped_ids);
-        new_seg = (uint32_t *)realloc(new_seg, sizeof(uint32_t)*(um->r[c] + 1));
+        seg = (uint32_t *)Seq_remhi(um->segs.unmapped_ids);
+        seg = (uint32_t *)realloc(seg, sizeof(uint32_t)*(um->r[c] + 1));
     }
-    new_seg[0] = um->r[c]; /* set the first word as size */
+    seg[0] = um->r[c]; /* set the first word as size */
     /* initialize each word to 0 */
-    for (int i = 1; i < um->r[c] + 1; i++) {
-        new_seg[i] = 0;
+    for (uint32_t i = 1; i < um->r[c] + 1; i++) {
+        seg[i] = 0;
     }
-    /* add the seg and id, while make sure it's a new id */
+    /* add the seg and id, while making sure it's a new id */
     assert(Table_put(um->segs.mem_space, 
                      (void *)(uintptr_t)um->r[b], 
-                     (void *)(uintptr_t)new_seg) == NULL);
+                     (void *)(uintptr_t)seg) == NULL);
 }
 
 /* opcode 9
  * ummap segment 
  */
 void unmap_segment(UM *um, Um_register c) {
+    /* unmapping $m[0] is not allowed */
+    assert(um->r[c] != 0); 
+    /* retains memory address for reuse */
+    uint32_t *keep = (uint32_t *)Table_get(um->segs.mem_space, 
+                                           (void *)(uintptr_t)um->r[c]);
+    assert(keep != NULL);
+
     /* unmap from the table, while check the id exists */
-    assert(Table_remove(um->segs.mem_space, (void *)(uintptr_t)um->r[c])
-                                                                    != NULL);
-    /* push the id to reusable seq */
-    Seq_addhi(um->segs.unmapped_ids, (void *)(uintptr_t)um->r[c]);
+    assert(Table_remove(um->segs.mem_space, (void *)(uintptr_t)um->r[c]));
+    /* push the ptr to reusable seq */
+    Seq_addhi(um->segs.unmapped_ids, (void *)(uintptr_t)keep);
     /* does not free memeory so that the address can be reused by realloc */
 }
 
@@ -312,13 +279,13 @@ void output(UM *um, Um_register c)
  *
  * Effects:
  *      - Reads a character from the standard input. If the character is EOF,
- *        stores -1 in register c; otherwise, stores the ASCII value.
+ *        stores UINT32_MAX in register c; otherwise, stores the ASCII value.
  ******************************/
 void input(UM *um, Um_register c)
 {
-    uint32_t input = fgetc(stdin);
+    int input = fgetc(stdin);
     if (input != EOF) {
-        assert(input <= 255);
+        assert(0 <= input && input <= 255);
         um->r[c] = input;
     }
     else {

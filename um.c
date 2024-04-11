@@ -2,11 +2,6 @@
  * CS 40 Assignment 6
  * Made by Spenser Rose (srose05) and Cheng Li (cli31)
  */
-
-/* c lib called */
-#include <stdio.h>
-
-/* lower abstractions */
 #include "um_operations.h"
 
 /* struct UM is in um_operations.h */
@@ -30,7 +25,7 @@ int main(int argc, char *argv[]) {
     /* Step1: read in instructions from fp */
     uint32_t *buffer = (uint32_t *)malloc(sizeof(uint32_t));
     size_t   num_of_inst = 0;
-    while (fread(buffer, sizeof(buffer), 1, fp) == 1) {
+    while (fread(buffer, sizeof(uint32_t), 1, fp) == 1) {
         num_of_inst++; /* first get num of insts for easier memeory alloc */
     }
     assert(feof(fp)); /* check .um file has complete instuctions */
@@ -55,9 +50,9 @@ int main(int argc, char *argv[]) {
     /* Step2: initialize um */
     UM um;
     initialize_UM(&um);
-    /* check $m[0] is loaded with program */
-    assert(Table_put(*um.segs, (void *)(uintptr_t)um.counter,
-                               (void *)(uintptr_t)buffer) != NULL);
+    /* check $m[0] is first loaded with program */
+    assert(Table_put(um.segs.mem_space, (void *)(uintptr_t)um.counter,
+                                        (void *)(uintptr_t)buffer) == NULL);
 
     /* Step3: execution cycle */
     for (; um.counter < num_of_inst; um.counter++) {
@@ -99,12 +94,12 @@ int main(int argc, char *argv[]) {
                 unmap_segment(&um, rc);
                 break;
             case OUT:
-                ouput(&um, rc);
+                output(&um, rc);
                 break;
             case IN:
                 input(&um, rc);
                 break;
-            case LOADP:
+            case LOADP: {
                 /* since in the beginning of func cycle, we chose to use buffer 
                 instead of running Table_get $m[0], we need to update buffer and 
                 num_of_inst after $m[0] was replaced in load program */
@@ -112,17 +107,20 @@ int main(int argc, char *argv[]) {
                 /* the old $m[0] should've been properly freed */
                 buffer = Table_get(um.segs.mem_space, (void *)(uintptr_t)0);
                 break;
-            case LV:
+            }
+            case LV: {
                 uint32_t value = Bitpack_getu(curr_inst, 25, 0);
                 load_value(&um, ra, value);
                 break;
+            }
             default:
+                break;
         }
+        print_um(&um);
     }
 
     /* free everything */
-    Table_free(&um.segs.mem_space);
-    Seq_free  (&um.segs.ummapped_ids);
+    free_um(&um);
 
     return 0;
 }

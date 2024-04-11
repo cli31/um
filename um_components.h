@@ -5,14 +5,18 @@
 #ifndef UM_COMPONENTS_H
 #define UM_COMPONENTS_H
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
+#include <bitpack.h>
+#include <assert.h>
 
 #include <table.h>
 #include <seq.h>
 
-const int HINT = 1000; /* estimated number of segments */
-const int num_of_regs = 8;
+#define HINT 1000 /* estimated number of segments */
+#define num_of_regs 8
 
 /* UM segments struct 
  * a pointer pointing to the memory space, used in form of segments
@@ -34,7 +38,27 @@ const int num_of_regs = 8;
 
 /* UM_segments struct 
  * contains memory space and unmapped id
- 
+ * Table:
+ *      key     value
+ *      id      pointer --> sequence of 32 bit words
+ *                          size    0th     1th     2th     ...
+ * By using this structure, 32 bit id can be used to indicate the 64 bit address
+ * 
+ * Seq:
+ *      unmapped ptr (not the 32 bit id! since under the hood we use realloc to
+ *  recycle id)
+ *      additionally, the spec proved my point: "A bit pattern that is not all 
+ * zeroes and that does not identify any CURRENTLY MAPPED segment is placed in 
+ * $r[B]." It means, for example, when calling map segment and gives a new id
+ * 17, even though there is an id 17 in the seq, a new pair is still created in
+ * table. In this case, if we store the 32 bit id instead of actual address, it
+ * actually has nothing to do with the program.
+ *      so to understand the id reusing in map_segment and ummap_segment:
+ * unmap_segment removes the id and ptr pair, push the ptr into the seq and
+ * forget id. When the seq is not empty, map_segment prioritize to use ptrs in
+ * seq, and make it accessible from client by assigning a new id to it -- an
+ * id not conflict with any available segment. In the end, we recycled the 
+ * memory by having a new identifier to it.
  */
 typedef struct UM_segments
 {
@@ -46,7 +70,7 @@ typedef struct UM_segments
  * all the components will be used in the Universal Machine
  * contains:
  *      8 registers, each holds 32 bit
- *      a ptr to UM_segments type
+ *      a segment type which explained before
  *      a counter, 32 bits
  * 
  * (no need to implement IO device since all the I/O's are from stdin and 
@@ -58,60 +82,26 @@ typedef struct UM {
         uint32_t counter;
 } UM;
 
+typedef uint32_t Um_instruction;
+typedef enum Um_opcode {
+        CMOV = 0, SLOAD, SSTORE, ADD, MUL, DIV,
+        NAND, HALT, ACTIVATE, INACTIVATE, OUT, IN, LOADP, LV
+} Um_opcode;
+typedef enum Um_register { r0 = 0, r1, r2, r3, r4, r5, r6, r7 } Um_register;
+
 /* helper functions */
 /* cmp is used in Table_new. For it's functionality, pls refer to Hanson */
-int intcmp(const void *x, const void *y) {
-    return (int)(*x) - (int)(*y);
-}
+int intcmp(const void *x, const void *y);
+unsigned hash(const void *x);
 
-extern void initialize_UM(UM *um) {
-    for (int i = 0; i < num_of_regs; i++) {
-        um->r[i] = 0;
-    }
-    um->counter = 0;
-    um->segs.mem_space    = Table_new(HINT, intcmp(), NULL);
-    um->segs.unmapped_ids = Seq_new  (HINT); 
-}
+void parse_inst(Um_instruction *curr_inst, Um_opcode *opcode, Um_register *ra, 
+                Um_register *rb, Um_register *rc);
+
+extern void initialize_UM(UM *um);
 
 /* used for debugging -- print out the machine to stderr */
-void print_um(const UM *um) {
-    fprintf(stderr, "counter = %d\n", um->counter);
-    for (int i = 0; i < num_of_regs; i++) {
-        fprintf(stderr, "r[%d] = %d\t", i, um->r[i]);
-    }
+void print_um(const UM *um);
 
-    fprintf(stderr, "\nsegmented memory:\n");
-    void **iterator = Table_toArray(um->segs.memspace, NULL);
-    /* Iterate over the array until the end marker is encountered */
-    while (*iterator != NULL) {
-        const uint32_t *key = (const uint32_t *)*iterator++;
-        const uint32_t **value = (const uint32_t **)*iterator++;
+void free_um(UM *um);
 
-        // Print the key-value pair
-        fprintf("id: %d,\t", *key);
-        uint32_t size = value[0];
-        fprintf("number of inst: %d,\t", size);
-        for (int i = 1; i < size + 1; i++) {
-            uint32_t curr_inst = value[i];
-            Um_opcode opcode = 14;
-            Um_register ra = 8, rb = 8, rc = 8;
-            parse_inst(&curr_inst, &opcode, &ra, &rb, &rc);
-            if (opcode == LV) {
-                fprintf(stderr, "opcode = %d,\tra = %d,\tvalue = %d\n", opcode, 
-                ra, Bitpack_getu(curr_inst, 25, 0));
-            }
-            else {
-                fprintf(stderr, "opcode = %d,\tra = %d,\trb = %d,\trc = %d\n",
-                        opcode, ra, rb, rc);
-            }
-            fprintf("*****next word*****\n");
-        }
-        fprintf("**********next segment**********\n\n");
-    }
-
-    fprintf(stderr, "\nunmapped id:\n");
-    uint32_t length = Seq_length(um->segs.unmapped_ids);
-    for (int i )
-}
-
-#undef UM_COMPONENTS_H
+#endif
