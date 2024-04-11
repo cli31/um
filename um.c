@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     initialize_UM(&um);
     /* check $m[0] is first loaded with program */
     assert(Table_put(um.segs.mem_space, (void *)(uintptr_t)um.counter,
-                                        (void *)(uintptr_t)buffer) == NULL);
+                                        buffer) == NULL);
 
     /* Step3: execution cycle */
     for (; um.counter < num_of_inst; um.counter++) {
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
                 break;
             case LOADP: {
                 /* since in the beginning of func cycle, we chose to use buffer 
-                instead of running Table_get $m[0], we need to update buffer and
+                instead of running Table_get $m[0], we need to update buffer and 
                 num_of_inst after $m[0] was replaced in load program */
                 load_program(&um, rb, rc);
                 /* the old $m[0] should've been properly freed */
