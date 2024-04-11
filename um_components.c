@@ -91,7 +91,7 @@ void print_um(const UM *um) {
             Um_register ra = 8, rb = 8, rc = 8;
             parse_inst(&curr_inst, &opcode, &ra, &rb, &rc);
             if (opcode == LV) {
-                fprintf(stderr, "opcode = %d,\tra = %d,\tvalue = %ld\n", opcode, 
+                fprintf(stderr, "opcode = %d,\tra = %d,\tvalue = %ld\n", opcode,
                 ra, Bitpack_getu(curr_inst, 25, 0));
             }
             else {

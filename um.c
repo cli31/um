@@ -29,14 +29,7 @@ int main(int argc, char *argv[]) {
         num_of_inst++; /* first get num of insts for easier memeory alloc */
     }
     assert(feof(fp)); /* check .um file has complete instuctions */
-    fclose(fp); /* re-read the file to set fp back to the beginning */
-    fp = fopen(argv[1], "rb");
-    if (!fp) {
-        fprintf(stderr, 
-                "Error: Cannot open file '%s' for reading.\n", 
-                argv[argc - 1]);
-        exit(EXIT_FAILURE);
-    }
+    fseek(fp, 0, SEEK_SET); /* move the fp back to the beginning of file */
     /* put size at the very front */
     buffer = (uint32_t *)realloc(buffer, sizeof(uint32_t) * (num_of_inst + 1));
     if (!buffer) {
@@ -44,7 +37,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
     buffer[0] = num_of_inst;
-    fread(buffer + 1, sizeof(buffer), num_of_inst, fp);
+    fread(buffer + 1, sizeof(uint32_t), num_of_inst, fp);
     fclose(fp);
 
     /* Step2: initialize um */
@@ -101,7 +94,7 @@ int main(int argc, char *argv[]) {
                 break;
             case LOADP: {
                 /* since in the beginning of func cycle, we chose to use buffer 
-                instead of running Table_get $m[0], we need to update buffer and 
+                instead of running Table_get $m[0], we need to update buffer and
                 num_of_inst after $m[0] was replaced in load program */
                 load_program(&um, rb, rc);
                 /* the old $m[0] should've been properly freed */
