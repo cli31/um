@@ -11,8 +11,6 @@
 /* lower abstractions */
 #include "um_operations.h"
 
-const int HINT = 1000; /* estimated number of segments */
-
 /* struct UM is in um_operations.h */
 
 int main(int argc, char *argv[]) {
@@ -50,12 +48,7 @@ int main(int argc, char *argv[]) {
     fread(buffer, sizeof(buffer), 1, fp);
 
     /* Step2: initialize um */
-    UM um = {
-        .r = { 0UL }, /* regs starts at all 0s */
-        .segs = NULL, /* rvalue to lvalue need to be done outside */
-        .counter = 0,
-        .reuse_id = NULL
-    };
+    UM um;
     UM_segments t = Table_new(HINT, NULL, NULL);
     um.segs = &t;
     assert(Table_put(*um.segs, (void *)(uintptr_t)um.counter,
@@ -67,7 +60,7 @@ int main(int argc, char *argv[]) {
     /* Step3: execution cycle */
     for (; um.counter < num_of_inst; um.counter++) {
         /* use buffer instead of Table_get for a simpler expression */
-        Um_instruction curr_inst = buffer[um.counter];
+        Um_instruction curr_inst = *(buffer + um.counter);
         Um_opcode opcode = 14; /* opcode from 0-13, check for valid inst */
         Um_register ra = 8, rb = 8, rc = 8; /* reg from 0-7 */
         parse_inst(&curr_inst, &opcode, &ra, &rb, &rc);
