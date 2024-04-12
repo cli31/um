@@ -160,8 +160,7 @@ void addition(UM *um, Um_register ra, Um_register rb, Um_register rc)
  ******************************/
 void multiplication(UM *um, Um_register ra, Um_register rb, Um_register rc)
 {
-        um->r[ra] = (uint32_t)(((uint64_t)um->r[rb] * (uint64_t)um->r[rc]) 
-                              % ((uint64_t)1 << 32));
+        um->r[ra] = um->r[rb] * um->r[rc];
 }
 
 
@@ -224,10 +223,6 @@ void bitwise_NAND(UM *um, Um_register a, Um_register b, Um_register c)
     um->r[a] = ~(um->r[b] & um->r[c]);
 }
 
-/* opcode 7
-* halt not needed, just free memory and return 
- */
-
 /********** map_segment **********
  * Maps a new memory segment in the Universal Machine's memory with a specified 
  * number of words, each initialized to 0.
@@ -256,35 +251,39 @@ void bitwise_NAND(UM *um, Um_register a, Um_register b, Um_register c)
  *      - Stores the new segment's identifier in register b.
  *      - Updates UM's memory management structures to include the new segment.
  ******************************/
-void map_segment(UM *um, Um_register b, Um_register c) 
+void map_segment(UM *um, Um_register b, Um_register c)
 {
-    uint32_t *seg;
-    int id = 0; /* invalid */
+    uint32_t *seg = NULL;
+    uint32_t id = 0; /* invalid */
     /* if there is no available id, alloc a new memory segment */
     if (Seq_length(um->segs.unmapped_ids) == 0) {
         seg = (uint32_t *)malloc(sizeof(uint32_t) * (um->r[c] + 1));
     }
     else {
         /* use from high end like a stack */
-        int id = (int)(uintptr_t)Seq_remhi(um->segs.unmapped_ids);
+        id = (uint32_t)(uintptr_t)Seq_remhi(um->segs.unmapped_ids);
         seg = (uint32_t *)Seq_get(um->segs.mem_space, id);
-        seg = (uint32_t *)realloc(seg, sizeof(uint32_t) * (um->r[c] + 1));
+        /* realloc not stable, switch to free and malloc */
+        /* seg = (uint32_t *)realloc(seg, sizeof(uint32_t) * (um->r[c] + 1)); */
+        free(seg);
+        seg = (uint32_t *)malloc(sizeof(uint32_t) * (um->r[c] + 1));
     }
+    assert(seg); /* check malloc succeed */
+
     seg[0] = um->r[c]; /* set the first word as size */
     /* initialize each word to 0 */
-    for (uint32_t i = 1; i < um->r[c] + 1; i++) {
+    for (uint32_t i = 1; i <= um->r[c]; i++) {
         seg[i] = 0;
     }
 
     if (id == 0) { /* if id is new, push to the high end */
-        Seq_addhi(um->segs.mem_space, (void *)(uintptr_t)seg);
+        Seq_addhi(um->segs.mem_space, seg);
         um->r[b] = Seq_length(um->segs.mem_space) - 1; /* actual id */
         assert(um->r[b] != 0); /* fail mode: bit pattern that's not all 0s */
     }
-    else { /* if id is recycled, update mem_space and pop from ids */
-        Seq_put(um->segs.mem_space, id, (void *)(uintptr_t)seg);
-        um->r[b] = id; 
-        Seq_remhi(um->segs.unmapped_ids);
+    else { /* if id is recycled, update mem_space (id has popped when called) */
+        Seq_put(um->segs.mem_space, id, seg);
+        um->r[b] = id;
     }
 }
 
@@ -418,7 +417,7 @@ void input(UM *um, Um_register c)
  void load_program(UM *um, Um_register b, Um_register c)
  {
     if (um->r[b] == 0) {
-        um->counter = um->r[c];
+        um->counter = um->r[c]; /* before next operation run */
         return; /* do nothing == extremely quick */
     }
     /* get $m($r[b]) */
@@ -432,7 +431,7 @@ void input(UM *um, Um_register c)
     uint32_t *new_seg = (uint32_t *)malloc(sizeof(uint32_t) * (size + 1));
     memcpy(new_seg, this_seg, sizeof(uint32_t) * (size + 1));
     /* the duplicate replace $m[0] */
-    Seq_put(um->segs.mem_space, 0, (void *)(uintptr_t)new_seg);
+    Seq_put(um->segs.mem_space, 0, new_seg);
     /* update the counter to $r[c] */
     assert(um->counter = um->r[c] <= size);
  }

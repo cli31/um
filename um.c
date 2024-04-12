@@ -61,7 +61,6 @@ int main(int argc, char *argv[])
         /* use buffer instead of Seq_get for a simpler expression */
         /* reset of program ptr was done in load program block */
         Um_instruction curr_inst = buffer[um.counter];
-
         Um_opcode opcode = 14; /* opcode from 0-13, check for valid inst */
         Um_register ra = 8, rb = 8, rc = 8; /* reg from 0-7 */
         parse_inst(&curr_inst, &opcode, &ra, &rb, &rc);
@@ -89,10 +88,9 @@ int main(int argc, char *argv[])
                 break;
             case HALT:  
                 /* free everything */
-                print_um(&um);
+                // print_um(&um);
                 free_um(&um);
                 return 0;
-                break;
             case ACTIVATE:
                 map_segment(&um, rb, rc);
                 break;
@@ -111,11 +109,11 @@ int main(int argc, char *argv[])
                 num_of_inst after $m[0] was replaced in load program */
                 load_program(&um, rb, rc);
                 /* the old $m[0] should've been properly freed */
-                buffer = Seq_get(um.segs.mem_space, 0);
+                buffer = (uint32_t *)Seq_get(um.segs.mem_space, 0);
                 break;
             }
             case LV: {
-                uint32_t value = Bitpack_getu(curr_inst, 25, 0);
+                uint32_t value = (curr_inst << 7) >> 7;
                 load_value(&um, ra, value);
                 break;
             }
@@ -123,7 +121,7 @@ int main(int argc, char *argv[])
                 assert(false);
                 break;
         }
-        print_um(&um);
+        // print_um(&um);
     }
     free_um(&um);
     return 0;

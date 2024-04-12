@@ -22,7 +22,7 @@
 void parse_inst(Um_instruction *curr_inst, Um_opcode *opcode, Um_register *ra, 
                                            Um_register *rb, Um_register *rc)
 {
-    *opcode = Bitpack_getu(*curr_inst, 4, 28);
+    *opcode = (*curr_inst) >> 28;
     assert(*opcode >= 0 && *opcode <= 13);
 
     if (*opcode == 13) {
@@ -137,7 +137,7 @@ void free_um(UM *um)
         free(Seq_get(um->segs.mem_space, i));
     }
 
-    Seq_free (&um->segs.mem_space);
-    Seq_free (&um->segs.unmapped_ids);
+    Seq_free(&um->segs.mem_space);
+    Seq_free(&um->segs.unmapped_ids);
 }
 
