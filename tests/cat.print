@@ -1,0 +1,378 @@
+counter = 1
+r[0] = 0	r[1] = 49	r[2] = 0	r[3] = 0	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 0	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 2
+r[0] = 0	r[1] = 49	r[2] = -50	r[3] = 0	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 0	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 3
+r[0] = 0	r[1] = 49	r[2] = -50	r[3] = 9	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 0	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 4
+r[0] = 0	r[1] = 49	r[2] = -50	r[3] = 9	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 6	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 5
+r[0] = 0	r[1] = 49	r[2] = -50	r[3] = 6	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 6	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 6
+r[0] = 0	r[1] = 49	r[2] = -50	r[3] = 6	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 6	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 7
+r[0] = 0	r[1] = 49	r[2] = -50	r[3] = 6	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 6	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 8
+r[0] = 0	r[1] = 49	r[2] = -50	r[3] = 6	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 0	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 0
+r[0] = 0	r[1] = 49	r[2] = -50	r[3] = 6	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 0	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 1
+r[0] = 0	r[1] = 10	r[2] = -50	r[3] = 6	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 0	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 2
+r[0] = 0	r[1] = 10	r[2] = -11	r[3] = 6	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 0	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 3
+r[0] = 0	r[1] = 10	r[2] = -11	r[3] = 9	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 0	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 4
+r[0] = 0	r[1] = 10	r[2] = -11	r[3] = 9	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 6	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 5
+r[0] = 0	r[1] = 10	r[2] = -11	r[3] = 6	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 6	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 6
+r[0] = 0	r[1] = 10	r[2] = -11	r[3] = 6	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 6	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 7
+r[0] = 0	r[1] = 10	r[2] = -11	r[3] = 6	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 6	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 8
+r[0] = 0	r[1] = 10	r[2] = -11	r[3] = 6	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 0	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+
+counter = 0
+r[0] = 0	r[1] = 10	r[2] = -11	r[3] = 6	r[4] = 0	r[5] = 0	r[6] = 0	r[7] = 0	
+segmented memory:
+id = 0,	number of inst = 10:
+opcode = 11,	ra = 0,	rb = 0,	rc = 1
+opcode = 6,	ra = 2,	rb = 1,	rc = 1
+opcode = 13,	ra = 3,	value = 9
+opcode = 13,	ra = 7,	value = 6
+opcode = 0,	ra = 3,	rb = 7,	rc = 2
+opcode = 12,	ra = 0,	rb = 0,	rc = 3
+opcode = 10,	ra = 0,	rb = 0,	rc = 1
+opcode = 13,	ra = 7,	value = 0
+opcode = 12,	ra = 0,	rb = 0,	rc = 7
+opcode = 7,	ra = 0,	rb = 0,	rc = 0
+
+**********next segment**********
+
+unmapped ids:
+
+um printed done 
+

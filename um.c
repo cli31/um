@@ -1,6 +1,6 @@
 /* um 
  * CS 40 Assignment 6
- * Made by Spenser Rose (srose05) and Cheng Li (cli31)
+ * Made by Spencer Rose (srose05) and Cheng Li (cli31)
  */
 #include "um_operations.h"
 
@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
                 break;
             case HALT:  
                 /* free everything */
+                print_um(&um);
                 free_um(&um);
                 return 0;
                 break;
@@ -124,6 +125,6 @@ int main(int argc, char *argv[])
         }
         print_um(&um);
     }
-
+    free_um(&um);
     return 0;
 }

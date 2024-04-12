@@ -20,7 +20,7 @@
  *      - Populates opcode, ra, rb, and rc with the extracted values.
  ******************************/
 void parse_inst(Um_instruction *curr_inst, Um_opcode *opcode, Um_register *ra, 
-                Um_register *rb, Um_register *rc)
+                                           Um_register *rb, Um_register *rc)
 {
     *opcode = Bitpack_getu(*curr_inst, 4, 28);
     assert(*opcode >= 0 && *opcode <= 13);
@@ -39,7 +39,28 @@ void parse_inst(Um_instruction *curr_inst, Um_opcode *opcode, Um_register *ra,
     }
 }
 
-void initialize_UM(UM *um) {
+/********** initialize_UM **********
+ * Initializes um by setting all registers to 0, setting up memory management 
+ * structures, and initializing the program counter.
+ *
+ * Parameters:
+ *      UM *um: Pointer to the UM instance to initialize.
+ *
+ * Return:
+ *      void
+ *
+ * Expects:
+ *      - um is not NULL and points to a valid, but uninitialized, UM structure.
+ *
+ * Effects:
+ *      - Resets all UM registers to 0.
+ *      - Initializes the program counter to 1, acknowledging that index 0 in 
+ *        each segment is reserved for the segment size.
+ *      - Allocates and initializes the memory space and unmapped ID sequences 
+ *        to manage memory segmentation and reclamation.
+ ******************************/
+void initialize_UM(UM *um) 
+{
     for (int i = 0; i < num_of_regs; i++) {
         um->r[i] = 0;
     }
@@ -48,7 +69,8 @@ void initialize_UM(UM *um) {
     um->segs.unmapped_ids = Seq_new(HINT); 
 }
 
-void print_um(const UM *um) {
+void print_um(const UM *um) 
+{
     fprintf(stderr, "counter = %d\n", um->counter);
     for (int i = 0; i < num_of_regs; i++) {
         fprintf(stderr, "r[%d] = %d\t", i, um->r[i]);
@@ -87,7 +109,29 @@ void print_um(const UM *um) {
     fprintf(stderr, "\num printed done \n\n");
 }
 
-void free_um(UM *um) {
+/********** free_um **********
+ * Frees all allocated memory associated with a Universal Machine (UM) 
+ * instance, including memory for all segments and management structures.
+ *
+ * Parameters:
+ *      UM *um: The UM instance to be freed.
+ *
+ * Return:
+ *      void
+ *
+ * Expects:
+ *      - um is not NULL and points to a valid UM instance that has been 
+ *        previously initialized.
+ *
+ * Effects:
+ *      - Frees each memory segment stored within the UM's memory space.
+ *      - Frees the sequences that manage the memory space and the sequence of 
+ *        unmapped segment identifiers.
+ *      - After executing this function, the UM instance and its memory 
+ *        structures are no longer valid and should not be used.
+ ******************************/
+void free_um(UM *um) 
+{
     int length = Seq_length(um->segs.mem_space);
     for (int i = 0; i < length; i++) {
         free(Seq_get(um->segs.mem_space, i));
