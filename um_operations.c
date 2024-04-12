@@ -1,7 +1,7 @@
 /******************************************************************
  *  um_operations.c
  *  Spencer Rose (srose05) and Cheng Li (cli31)
- *  Date last edited: 4/11/24
+ *  Date last edited: 4/12/24
  *
  *  CS 40 HW 6: UM
  *
@@ -44,9 +44,9 @@ void conditional_move(UM *um, Um_register ra, Um_register rb, Um_register rc)
  * Parameters:
  *      UM *um: The Universal Machine instance executing this operation.
  *      Um_register ra: The register to store the loaded word.
- *      Um_register rb: The register containing the identifier of the segment 
+ *      Um_register rb: The register containing the identifier of the segment
  *      to load from.
- *      Um_register rc: The register containing the offset within the segment 
+ *      Um_register rc: The register containing the offset within the segment
  *      from where to load the word.
  *
  * Return:
@@ -54,16 +54,16 @@ void conditional_move(UM *um, Um_register ra, Um_register rb, Um_register rc)
  *
  * Expects:
  *      - um is not NULL and points to a valid UM instance.
- *      - ra, rb, and rc are valid register indices within the bounds of the 
+ *      - ra, rb, and rc are valid register indices within the bounds of the
  *        UM's register array.
- *      - The offset specified in register rc is within the bounds of the 
+ *      - The offset specified in register rc is within the bounds of the
  *        identified segment.
  *
  * Effects:
- *      - Retrieves the word at the specified offset within the segment 
+ *      - Retrieves the word at the specified offset within the segment
  *        identified by register rb.
  *      - Stores the retrieved word in register ra.
- *      - Asserts ensure that the operation is valid, including segment 
+ *      - Asserts ensure that the operation is valid, including segment
  *        existence, mapping status, and offset bounds.
  ******************************/
 void segmented_load(UM *um, Um_register ra, Um_register rb, Um_register rc)
@@ -73,7 +73,7 @@ void segmented_load(UM *um, Um_register ra, Um_register rb, Um_register rc)
     assert(curr_seg); /* check if out of bound */
     assert(curr_seg[0] != 0); /* check if the id is unmapped */
     assert(um->r[rc] < curr_seg[0]); /* check in the range */
-    um->r[ra] = curr_seg[um->r[rc] + 1]; /* size takes the 0 idx */ 
+    um->r[ra] = curr_seg[um->r[rc] + 1]; /* size takes the 0 idx */
 }
 
 /********** segmented_store **********
@@ -81,9 +81,9 @@ void segmented_load(UM *um, Um_register ra, Um_register rb, Um_register rc)
  *
  * Parameters:
  *      UM *um: The Universal Machine instance executing this operation.
- *      Um_register ra: The register containing the identifier of the segment 
+ *      Um_register ra: The register containing the identifier of the segment
  *      to store into.
- *      Um_register rb: The register containing the offset within the segment 
+ *      Um_register rb: The register containing the offset within the segment
  *      where to store the word.
  *      Um_register rc: The register containing the word to store.
  *
@@ -92,15 +92,15 @@ void segmented_load(UM *um, Um_register ra, Um_register rb, Um_register rc)
  *
  * Expects:
  *      - um is not NULL and points to a valid UM instance.
- *      - ra, rb, and rc are valid register indices within the bounds of the 
+ *      - ra, rb, and rc are valid register indices within the bounds of the
  *        UM's register array.
  *      - The offset specified in register rb is within the bounds of the i
  *        identified segment.
  *
  * Effects:
- *      - Stores the word from register rc at the specified offset within the 
+ *      - Stores the word from register rc at the specified offset within the
  *        segment identified by register ra.
- *      - Asserts ensure that the operation is valid, including segment 
+ *      - Asserts ensure that the operation is valid, including segment
  *        existence, mapping status, and offset bounds.
  ******************************/
 void segmented_store(UM *um, Um_register ra, Um_register rb, Um_register rc)
@@ -224,29 +224,29 @@ void bitwise_NAND(UM *um, Um_register a, Um_register b, Um_register c)
 }
 
 /********** map_segment **********
- * Maps a new memory segment in the Universal Machine's memory with a specified 
+ * Maps a new memory segment in the Universal Machine's memory with a specified
  * number of words, each initialized to 0.
  *
  * Parameters:
  *      UM *um: The Universal Machine instance.
- *      Um_register b: The register to store the newly mapped segment's 
+ *      Um_register b: The register to store the newly mapped segment's
  *      identifier.
- *      Um_register c: The register containing the size (number of words) of 
+ *      Um_register c: The register containing the size (number of words) of
  *      the new segment to map.
  *
  * Return:
  *      void
  *
  * Expects:
- *      - um is not NULL and points to a valid UM instance with initialized 
+ *      - um is not NULL and points to a valid UM instance with initialized
  *        memory management structures.
- *      - b and c are valid register indices within the bounds of the UM's 
+ *      - b and c are valid register indices within the bounds of the UM's
  *        register array.
- *      - The value in register c represents a non-negative size for the new 
+ *      - The value in register c represents a non-negative size for the new
  *        memory segment.
  *
  * Effects:
- *      - Allocates a new memory segment of the specified size, with each word 
+ *      - Allocates a new memory segment of the specified size, with each word
  *        initialized to 0.
  *      - Stores the new segment's identifier in register b.
  *      - Updates UM's memory management structures to include the new segment.
@@ -288,7 +288,7 @@ void map_segment(UM *um, Um_register b, Um_register c)
 }
 
 /********** unmap_segment **********
- * Unmaps (deallocates) a previously mapped segment in the Universal Machine's 
+ * Unmaps (deallocates) a previously mapped segment in the Universal Machine's
  * memory, making its identifier reusable.
  *
  * Parameters:
@@ -299,30 +299,30 @@ void map_segment(UM *um, Um_register b, Um_register c)
  *      void
  *
  * Expects:
- *      - um is not NULL and points to a valid UM instance with initialized 
+ *      - um is not NULL and points to a valid UM instance with initialized
  *        memory management structures.
- *      - c is a valid register index within the bounds of the UM's register 
+ *      - c is a valid register index within the bounds of the UM's register
  *        array.
- *      - The value in register c is not 0, as unmapping the 0th segment is 
+ *      - The value in register c is not 0, as unmapping the 0th segment is
  *        disallowed.
- *      - The segment identified by the value in register c exists and is 
+ *      - The segment identified by the value in register c exists and is
  *        currently mapped.
  *
  * Effects:
- *      - Marks the segment identified by the value in register c as unmapped 
+ *      - Marks the segment identified by the value in register c as unmapped
  *        by setting its size indicator to 0.
- *      - Adds the segment's identifier to the list of reusable identifiers, 
+ *      - Adds the segment's identifier to the list of reusable identifiers,
  *        allowing future segments to be mapped using this identifier.
  ******************************/
-void unmap_segment(UM *um, Um_register c) 
+void unmap_segment(UM *um, Um_register c)
 {
     /* unmapping $m[0] is not allowed */
-    assert(um->r[c] != 0); 
+    assert(um->r[c] != 0);
 
     uint32_t *seg = (uint32_t *)Seq_get(um->segs.mem_space, um->r[c]);
     assert(seg); /* check out of bound */
     assert(seg[0] != 0);
-    /* assign an invalid indicator (size 0) to unmapped segment 
+    /* assign an invalid indicator (size 0) to unmapped segment
        so when checking if an id is unmapped, we don't need to iterate through
        unmapped_ids */
     seg[0] = 0;

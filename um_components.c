@@ -1,3 +1,20 @@
+/******************************************************************
+ * um_components.c
+ * Authors: Spencer Rose (srose05) and Cheng Li (cli31)
+ * Date last edited: 4/12/24
+ *
+ *
+ *  CS 40 HW 6: UM
+ * Description:
+ * This source file implements utility functions for the Universal Machine (UM),
+ * including instruction parsing, machine initialization, machine state
+ * printing, and resource deallocation. These utilities support the core
+ * functionality of the UM by enabling instruction execution, managing memory
+ * and registers, and facilitating debugging and clean shutdown.
+ *
+ * The file depends on "um_components.h" for structure definitions and constants,
+ * ensuring a modular and maintainable implementation of the UM.
+ ******************************************************************/
 #include "um_components.h"
 
 /********** parse_inst **********
@@ -19,7 +36,7 @@
  *      - Extracts the opcode and registers from curr_inst.
  *      - Populates opcode, ra, rb, and rc with the extracted values.
  ******************************/
-void parse_inst(Um_instruction *curr_inst, Um_opcode *opcode, Um_register *ra, 
+void parse_inst(Um_instruction *curr_inst, Um_opcode *opcode, Um_register *ra,
                                            Um_register *rb, Um_register *rc)
 {
     *opcode = (*curr_inst) >> 28;
@@ -40,7 +57,7 @@ void parse_inst(Um_instruction *curr_inst, Um_opcode *opcode, Um_register *ra,
 }
 
 /********** initialize_UM **********
- * Initializes um by setting all registers to 0, setting up memory management 
+ * Initializes um by setting all registers to 0, setting up memory management
  * structures, and initializing the program counter.
  *
  * Parameters:
@@ -54,22 +71,22 @@ void parse_inst(Um_instruction *curr_inst, Um_opcode *opcode, Um_register *ra,
  *
  * Effects:
  *      - Resets all UM registers to 0.
- *      - Initializes the program counter to 1, acknowledging that index 0 in 
+ *      - Initializes the program counter to 1, acknowledging that index 0 in
  *        each segment is reserved for the segment size.
- *      - Allocates and initializes the memory space and unmapped ID sequences 
+ *      - Allocates and initializes the memory space and unmapped ID sequences
  *        to manage memory segmentation and reclamation.
  ******************************/
-void initialize_UM(UM *um) 
+void initialize_UM(UM *um)
 {
     for (int i = 0; i < num_of_regs; i++) {
         um->r[i] = 0;
     }
     um->counter = 1; /* since idx 0 is always the size */
     um->segs.mem_space    = Seq_new(HINT);
-    um->segs.unmapped_ids = Seq_new(HINT); 
+    um->segs.unmapped_ids = Seq_new(HINT);
 }
 
-void print_um(const UM *um) 
+void print_um(const UM *um)
 {
     fprintf(stderr, "counter = %d\n", um->counter);
     for (int i = 0; i < num_of_regs; i++) {
@@ -90,7 +107,7 @@ void print_um(const UM *um)
             Um_register ra = 8, rb = 8, rc = 8;
             parse_inst(&curr_inst, &opcode, &ra, &rb, &rc);
             if (opcode == LV) {
-                fprintf(stderr, "opcode = %d,\tra = %d,\tvalue = %ld\n", opcode, 
+                fprintf(stderr, "opcode = %d,\tra = %d,\tvalue = %ld\n", opcode,
                 ra, Bitpack_getu(curr_inst, 25, 0));
             }
             else {
@@ -110,7 +127,7 @@ void print_um(const UM *um)
 }
 
 /********** free_um **********
- * Frees all allocated memory associated with a Universal Machine (UM) 
+ * Frees all allocated memory associated with a Universal Machine (UM)
  * instance, including memory for all segments and management structures.
  *
  * Parameters:
@@ -120,17 +137,17 @@ void print_um(const UM *um)
  *      void
  *
  * Expects:
- *      - um is not NULL and points to a valid UM instance that has been 
+ *      - um is not NULL and points to a valid UM instance that has been
  *        previously initialized.
  *
  * Effects:
  *      - Frees each memory segment stored within the UM's memory space.
- *      - Frees the sequences that manage the memory space and the sequence of 
+ *      - Frees the sequences that manage the memory space and the sequence of
  *        unmapped segment identifiers.
- *      - After executing this function, the UM instance and its memory 
+ *      - After executing this function, the UM instance and its memory
  *        structures are no longer valid and should not be used.
  ******************************/
-void free_um(UM *um) 
+void free_um(UM *um)
 {
     int length = Seq_length(um->segs.mem_space);
     for (int i = 0; i < length; i++) {
@@ -140,4 +157,3 @@ void free_um(UM *um)
     Seq_free(&um->segs.mem_space);
     Seq_free(&um->segs.unmapped_ids);
 }
-
