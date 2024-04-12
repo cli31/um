@@ -1,0 +1,158 @@
+README
+
+Partners: Spencer Rose (srose05) and Cheng Li (cli31)
+
+Acknowledgements: TA's in OH for our design and help thinking about our
+Implementation. A special thank you to the TA who stayed up til 1 with us
+working on debugging and allowed us to make massive progress so that we could
+submit
+
+Functionality: We believe everything is in working order
+
+Design: No significant deviations from design that we can think of
+
+Architecture:
+
+UMTESTS:
+add.um
+build_bitwise_nand_test.um
+build_cmove_move.um
+build_digit_print.um
+build_div_O.um
+build_divide.um
+build_in_out.um
+build_input_handling_test.um
+build_load_program.um
+build_map_unmap_large.um
+build_map_unmap_loop.um
+build_map_unmap.um
+build_multiply_divide.um
+build_multiply.um
+build_nand.um
+build_read_nand.um
+build_simple_print.um
+build_sstore_then_load.um
+halt-verbose.um
+halt.um
+
+build_addition_test
+Purpose: Tests the addition operation by loading values into registers, adding
+them, and outputting the result.
+Method: Loads 5 into r1 and 10 into r2, adds them together into r3, and outputs
+r3 (expecting 15), then halts.
+
+build_add_test
+Purpose: A simplified version of build_addition_test without explicit values,
+primarily testing the add functionality directly.
+Method: Adds r2 and r3, stores the result in r1, and halts immediately.
+
+build_halt_test
+Purpose: Verifies the halt operation's effectiveness in stopping the UM.
+Method: Executes a halt instruction without any prior operations.
+
+build_digit_print
+Purpose: Tests loading, addition, and output by printing a calculated sum.
+Method: Loads 45 into r1, 3 into r2, adds them into r3, outputs r3 (expecting
+48), then halts.
+
+build_conditional_move_test
+Purpose: Checks the conditional move (CMOV) operation under conditions where it
+should and should not trigger.
+Method: Sets up registers such that r1 is conditionally moved to r2 based on
+r3, outputs r1, and expects it to remain unchanged due to the condition not
+being met.
+
+build_memory_allocation_test
+Purpose: Tests memory allocation (segment mapping), storage, and retrieval
+operations.
+Method: Allocates a segment, stores a value, retrieves it, outputs the
+retrieved value, and halts.
+
+build_jump_test
+Purpose: Verifies that the jump operation correctly changes the instruction
+pointer.
+Method: Sets up a jump that should skip over a failing instruction to a success
+indicator and outputs a success message if jumped correctly.
+
+build_simple_print
+Purpose: Simple test to load and output a single value.
+Method: Loads 69 into r1, attempts to output r3 (which is not set), and halts.
+
+build_divide
+Purpose: Tests division operation by dividing two numbers and outputting the
+result.
+Method: Loads 200 into r1 and 4 into r2, divides r1 by r2 into r3, outputs r3
+(expecting 50), and halts.
+
+build_multiply
+Purpose: Tests multiplication by multiplying values and adjusting the result
+for output.
+Method: Multiplies 2 by 3, adds 48 to the product, outputs the result, and
+halts.
+
+build_multiply_divide
+Purpose: A combination test to verify both multiply and divide operations
+together.
+Method: Multiplies two values, divides the result, adjusts with an add
+operation, outputs the final value, and halts.
+
+build_nand
+Purpose: Tests the bitwise NAND operation by performing NAND on two values and
+adjusting for output.
+Method: Executes a NAND operation, adds to adjust the result, outputs, and
+halts.
+
+build_in_out
+Purpose: Tests input and output functionality by echoing a character.
+Method: Reads an input character, outputs it, and halts.
+
+build_sstore_then_load
+Purpose: Tests storing and then loading from a segment to verify memory
+operations.
+Method: Stores a value in a segment and then loads it for output.
+
+build_map_unmap
+Purpose: Verifies memory mapping and unmapping operations and their impact on
+segment IDs.
+Method: Maps and then unmaps several segments, testing for correct handling of
+segment IDs and halts.
+
+build_load_program
+Purpose: Tests the load program operation by loading a new program into segment
+0 and executing.
+Method: Maps a segment, stores instructions, uses load program to execute new
+instructions, expecting to change execution flow and halt.
+
+build_read_nand
+Purpose: Tests reading an input, performing NAND, and adjusting the result for
+output.
+Method: Reads input, performs NAND with a constant, adjusts the result,
+outputs, and halts.
+
+build_map_unmap_loop
+Purpose: Stress tests the map and unmap functionality through intensive use.
+Method: Repeatedly maps and unmaps a segment in a loop, then outputs a success
+message and halts.
+
+build_bitwise_nand_test
+Purpose: Specifically tests the NAND operation in isolation.
+Method: Performs a NAND on two constants, outputs the result, and halts.
+
+build_input_handling_test
+Purpose: Tests handling of user input and output.
+Method: Waits for an input character, outputs the character, and halts.
+
+build_unconditional_jump_test
+Purpose: Tests unconditional jump functionality.
+Method: Attempts to jump to a specific instruction without conditions.
+
+Invalid Test Cases:
+These tests are designed to trigger failures or verify error handling in UM
+we removed them from our code after
+build_execute_unmapped_segment: Tries to execute from an unmapped segment.
+build_out_of_bounds_access: Attempts to access memory outside segment bounds.
+build_div_nonzero_by_zero: Tests division by zero handling.
+build_invalid_instruction: Tries to execute an invalid or undefined instruction.
+build_dealloc_and_access: Attempts to access a segment after deallocating it.
+
+Hours Spent: 5 hours analyzing, 2 hours preparing, 20 after analysis = 27 total

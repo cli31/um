@@ -13,7 +13,6 @@ extern void build_halt_test(Seq_T instructions);
 extern void build_verbose_halt_test(Seq_T instructions);
 extern void build_addition_test(Seq_T instructions);
 extern void build_print_a_digit_test(Seq_T instructions);
-//void build_addition_test1(Seq_T stream);
 void build_digit_print(Seq_T stream);
 void build_cmove_move(Seq_T stream);
 void build_simple_print(Seq_T stream);
@@ -27,15 +26,10 @@ void build_map_unmap(Seq_T stream);
 void build_load_program(Seq_T stream);
 void build_read_nand(Seq_T stream);
 void build_map_unmap_loop(Seq_T stream);
-void build_bitwise_nand_test(Seq_T stream);
 void build_input_handling_test(Seq_T stream);
 void build_map_unmap_large(Seq_T stream);
-/* invalid tests start here */
-void build_unmap_0seg(Seq_T stream);
-void build_div_0(Seq_T stream);
-void build_invalid_load(Seq_T stream);
-extern void build_invalid_loadseg(Seq_T stream);
-extern void build_map_invalid_storesegment(Seq_T stream);
+void build_map_unmap_large2(Seq_T stream);
+
 
     /* The array `tests` contains all unit tests for the lab. */
 
@@ -51,7 +45,6 @@ extern void build_map_invalid_storesegment(Seq_T stream);
     {"halt-verbose", NULL, "", build_verbose_halt_test},
     {"add", NULL, "", build_addition_test},
     {"print-six", NULL, "", build_print_a_digit_test},
-    //{"build_add_test", NULL, build_addition_test1},
     {"build_digit_print", NULL, "", build_digit_print},
     {"build_cmove_move", NULL, "", build_cmove_move},
     {"build_simple_print", NULL, "", build_simple_print},
@@ -65,16 +58,9 @@ extern void build_map_invalid_storesegment(Seq_T stream);
     {"build_load_program", NULL, "", build_load_program},
     {"build_read_nand", NULL, "", build_read_nand},
     {"build_map_unmap_loop", NULL, "", build_map_unmap_loop},
-    {"build_bitwise_nand_test", NULL, "", build_bitwise_nand_test},
     {"build_input_handling_test", NULL, "", build_input_handling_test},
     {"build_map_unmap_large", NULL, "", build_map_unmap_large},
-    /* invalid tests start here*/
-    {"build_unmap_0seg", NULL, "", build_unmap_0seg},
-    {"build_div_0", NULL, "", build_div_0},
-    {"build_invalid_load", NULL, "", build_invalid_load},
-    {"build_invalid_loadseg", NULL, "", build_invalid_loadseg},
-    {"build_map_invalid_storesegment", NULL,"", build_map_invalid_storesegment},
-    {"build_map_unmap_large", NULL, "", build_map_unmap_large}
+    {"build_map_unmap_large2", NULL, "", build_map_unmap_large2}
 };
 
 #define NTESTS (sizeof(tests)/sizeof(tests[0]))

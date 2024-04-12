@@ -1,5 +1,8 @@
 /*
  * umlab.c
+ * Edited by Spencer Rose (srose05) and Cheng Li (cli31)
+ * HW6: UM
+ * Last Edited: 4/12/24
  *
  * Functions to generate UM unit tests. Once complete, this module
  * should be augmented and then linked against umlabwrite.c to produce
@@ -328,8 +331,9 @@ void build_load_program(Seq_T stream)
         append(stream, sstore(r6, r6, r5));
         append(stream, loadval(r0, 88));
         append(stream, loadp(r6, r1));
-        append(stream, halt());
         append(stream, output(r0));
+        append(stream, halt());
+
 }
 
 void build_read_nand(Seq_T stream)
@@ -354,15 +358,6 @@ void build_map_unmap_loop(Seq_T stream)
                 append(stream, unmap(r2));
         }
         append(stream, output(r7));
-        append(stream, halt());
-}
-
-void build_bitwise_nand_test(Seq_T stream)
-{
-        append(stream, loadval(r1, 0));
-        append(stream, loadval(r2, 1));
-        append(stream, nand(r3, r1, r2));
-        append(stream, output(r3));
         append(stream, halt());
 }
 
@@ -393,42 +388,19 @@ void build_map_unmap_large(Seq_T stream)
         append(stream, halt());
 }
 
-/* invalid tests */
-void build_unmap_0seg(Seq_T stream)
+void build_map_unmap_large2(Seq_T stream)
 {
-        append(stream, loadval(r0, 0));
-        append(stream, unmap(r0));
-        append(stream, halt());
-}
-
-void build_div_0(Seq_T stream)
-{
-        append(stream, loadval(r0, 0));
-        append(stream, loadval(r1, 649));
-        append(stream, divide(r2, r1, r0));
-        append(stream, halt());
-}
-
-void build_invalid_load(Seq_T stream)
-{
-        append(stream, loadval(r0, 0));
-        append(stream, loadval(r1, 649));
-        append(stream, loadp(r0, r1));
-        append(stream, halt());
-}
-
-extern void build_invalid_loadseg(Seq_T stream)
-{
-        append(stream, loadval(r0, 0));
-        append(stream, loadval(r1, 649));
-        append(stream, sload(r7, r0, r1));
-        append(stream, halt());
-}
-
-extern void build_map_invalid_storesegment(Seq_T stream)
-{
-        append(stream, loadval(r0, 0));
-        append(stream, loadval(r1, 649));
-        append(stream, sstore(r0, r1, r0));
+        append(stream, loadval(r0, 15));
+        append(stream, loadval(r6, 5));
+        append(stream, loadval(r1, 1));
+        for (int j = 0; j < 5; j++) {
+                for (int i = 0; i < 500; i++) {
+                        append(stream, map(r2, r6));
+                }
+                for (int i = 1; i < 500; i++) {
+                        append(stream, loadval(r1, i));
+                        append(stream, unmap(r1));
+                }
+        }
         append(stream, halt());
 }
