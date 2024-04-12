@@ -45,9 +45,8 @@ void conditional_move(UM *um, Um_register ra, Um_register rb, Um_register rc)
 void segmented_load(UM *um, Um_register ra, Um_register rb, Um_register rc)
 {
     /* retrieve the segment with id $r[b] */
-    uint32_t *curr_seg = (uint32_t *)Table_get(um->segs.mem_space, 
-                                               (void *)(uintptr_t)um->r[rb]);
-    assert(curr_seg != NULL);
+    uint32_t *curr_seg = (uint32_t *)Seq_get(um->segs.mem_space, um->r[rb]);
+    assert(curr_seg[0] != 0); /* check if the id is unmapped */
     assert(um->r[rc] < curr_seg[0]); /* check in the range */
     um->r[ra] = curr_seg[rc + 1]; /* size takes the 0 idx */ 
 }
@@ -57,13 +56,11 @@ void segmented_load(UM *um, Um_register ra, Um_register rb, Um_register rc)
  */
 void segmented_store(UM *um, Um_register ra, Um_register rb, Um_register rc)
 {
-    uint32_t *curr_seg = (uint32_t *)Table_get(um->segs.mem_space, 
-                                               (void *)(uintptr_t)um->r[ra]);
-    assert(curr_seg != NULL);
+    uint32_t *curr_seg = (uint32_t *)Seq_get(um->segs.mem_space, um->r[ra]);
+    assert(curr_seg[0] != 0);
     assert(um->r[rb] < curr_seg[0]); /* check in the range */
     curr_seg[rb + 1] = um->r[rc];
 }
-
 
 /********** addition **********
  * Adds the values in two registers and stores the result in a third register.
@@ -113,8 +110,8 @@ void addition(UM *um, Um_register ra, Um_register rb, Um_register rc)
  ******************************/
 void multiplication(UM *um, Um_register ra, Um_register rb, Um_register rc)
 {
-        um->r[ra] = ((uint64_t)um->r[rb] * (uint64_t)um->r[rc]) 
-                    & ((uint32_t)-1);
+        um->r[ra] = (uint32_t)((uint64_t)um->r[rb] * (uint64_t)um->r[rc]) 
+                              % ((uint64_t)1 << 32);
 }
 
 
@@ -177,30 +174,15 @@ void bitwise_NAND(UM *um, Um_register a, Um_register b, Um_register c)
     um->r[a] = ~(um->r[b] & um->r[c]);
 }
 
-/********** halt **********
- * Halts execution of the Universal Machine.
- *
- * Parameters:
- *      void
- *
- * Return:
- *      void
- *
- * Expects:
- *      - This operation has no parameters.
- *
- * Effects:
- *      - Signals the UM to stop execution.
- ******************************/
-void halt(void) {
-}
+/* opcode 7
+* halt not needed, just free memory and return 
+ */
 
 /* opcode 8
  * map segment
  * 
  */
 void map_segment(UM *um, Um_register b, Um_register c) {
-    /* create a new segment */
     uint32_t *seg;
     /* if there is no available id, alloc a new memory segment */
     if (Seq_length(um->segs.unmapped_ids) == 0) {
@@ -208,18 +190,18 @@ void map_segment(UM *um, Um_register b, Um_register c) {
     }
     else {
         /* use from high end like a stack */
-        seg = (uint32_t *)Seq_remhi(um->segs.unmapped_ids);
-        seg = (uint32_t *)realloc(seg, sizeof(uint32_t)*(um->r[c] + 1));
+        int id = *(int *)Seq_remhi(um->segs.unmapped_ids);
+        seg = (uint32_t *)Seq_get(um->segs.mem_space, id);
+        seg = (uint32_t *)realloc(seg, sizeof(uint32_t) * (um->r[c] + 1));
     }
     seg[0] = um->r[c]; /* set the first word as size */
     /* initialize each word to 0 */
     for (uint32_t i = 1; i < um->r[c] + 1; i++) {
         seg[i] = 0;
     }
-    /* add the seg and id, while making sure it's a new id */
-    assert(Table_put(um->segs.mem_space, 
-                     (void *)(uintptr_t)um->r[b], 
-                     (void *)(uintptr_t)seg) == NULL);
+    /* add the seg; id is the high end (length - 1) */
+    Seq_addhi(um->segs.mem_space, (void *)(uintptr_t)seg);
+    um->r[b] = Seq_length(um->segs.mem_space) - 1;
 }
 
 /* opcode 9
@@ -228,15 +210,16 @@ void map_segment(UM *um, Um_register b, Um_register c) {
 void unmap_segment(UM *um, Um_register c) {
     /* unmapping $m[0] is not allowed */
     assert(um->r[c] != 0); 
-    /* retains memory address for reuse */
-    uint32_t *keep = (uint32_t *)Table_get(um->segs.mem_space, 
-                                           (void *)(uintptr_t)um->r[c]);
-    assert(keep != NULL);
 
-    /* unmap from the table, while check the id exists */
-    assert(Table_remove(um->segs.mem_space, (void *)(uintptr_t)um->r[c]));
-    /* push the ptr to reusable seq */
-    Seq_addhi(um->segs.unmapped_ids, (void *)(uintptr_t)keep);
+    uint32_t *seg = (uint32_t *)Seq_get(um->segs.mem_space, um->r[c]);
+    assert(seg[0] != 0);
+    /* assign an invalid indicator (size 0) to unmapped segment 
+       so when checking if an id is unmapped, we don't need to iterate through
+       unmapped_ids */
+    seg[0] = 0;
+
+    /* push the id to reusable seq */
+    Seq_addhi(um->segs.unmapped_ids, (void *)(uintptr_t)um->r[c]);
     /* does not free memeory so that the address can be reused by realloc */
 }
 
@@ -328,18 +311,16 @@ void input(UM *um, Um_register c)
         return; /* do nothing == extremely quick */
     }
     /* get $m($r[b]) */
-    uint32_t *this_seg = (uint32_t *)Table_get(um->segs.mem_space,
-                                               (void *)(uintptr_t)um->r[b]);
+    uint32_t *this_seg = (uint32_t *)Seq_get(um->segs.mem_space, um->r[b]);
     assert(this_seg != NULL);
     /* free $m[0] */
-    free((uint32_t *)Table_get(um->segs.mem_space, (void *)(uintptr_t)0));
+    free((uint32_t *)Seq_get(um->segs.mem_space, 0));
     /* duplicate */
     uint32_t size = this_seg[0];
     uint32_t *new_seg = (uint32_t *)malloc(sizeof(uint32_t) * (size + 1));
     memcpy(new_seg, this_seg, sizeof(uint32_t) * (size + 1));
     /* the duplicate replace $m[0] */
-    Table_put(um->segs.mem_space, (void *)(uintptr_t)0, 
-                                  (void *)(uintptr_t)new_seg);
+    Seq_put(um->segs.mem_space, 0, (void *)(uintptr_t)new_seg);
     /* update the counter to $r[c] */
     assert(um->counter = um->r[c] <= size);
  }

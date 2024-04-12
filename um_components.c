@@ -1,25 +1,5 @@
 #include "um_components.h"
 
-int intcmp(const void *x, const void *y) {
-    /* note: when the difference is > 2^31, typecast to int will be +ve */
-    /* to avoid it, we compare instead of doing subtraction */
-    if (*(uint32_t *)x < *(uint32_t *)y) {
-        return -1;
-    }
-    else if (*(uint32_t *)x > *(uint32_t *)y) {
-        return 1;
-    }
-    else {
-        return 0;
-    }
-}
-
-unsigned hash(const void *x) {
-    /* key is always a uint32_t id, and Hanson table request an unsigned return.
-    We can simply cast to make them onto */
-    return (unsigned)*(uint32_t *)x;
-}
-
 /********** parse_inst **********
  * Parses an instruction and populates opcode and register operands.
  *
@@ -59,13 +39,13 @@ void parse_inst(Um_instruction *curr_inst, Um_opcode *opcode, Um_register *ra,
     }
 }
 
-extern void initialize_UM(UM *um) {
+void initialize_UM(UM *um) {
     for (int i = 0; i < num_of_regs; i++) {
         um->r[i] = 0;
     }
-    um->counter = 0;
-    um->segs.mem_space    = Table_new(HINT, intcmp, hash);
-    um->segs.unmapped_ids = Seq_new  (HINT); 
+    um->counter = 1; /* since idx 0 is always the size */
+    um->segs.mem_space    = Seq_new(HINT);
+    um->segs.unmapped_ids = Seq_new(HINT); 
 }
 
 void print_um(const UM *um) {
@@ -75,18 +55,15 @@ void print_um(const UM *um) {
     }
 
     fprintf(stderr, "\nsegmented memory:\n");
-    void **iterator = Table_toArray(um->segs.mem_space, NULL);
-    /* Iterate over the array until the end marker is encountered */
-    while (*iterator != NULL) {
-        uint32_t *key = (uint32_t *)*iterator++;
-        uint32_t **value = (uint32_t **)*iterator++;
-
-        // Print the key-value pair
-        fprintf(stderr, "id: %d,\t", *key);
-        uint32_t size = (*value)[0];
-        fprintf(stderr, "number of inst: %d,\t", size);
-        for (uint32_t i = 1; i < size + 1; i++) {
-            uint32_t curr_inst = (*value)[i];
+    /* Iterate over the Seq_T */
+    int length = Seq_length(um->segs.mem_space);
+    for (int i = 0; i < length; i++) {
+        fprintf(stderr, "id = %d,\t", i);
+        uint32_t *curr_seg = Seq_get(um->segs.mem_space, i);
+        unsigned size = curr_seg[0];
+        fprintf(stderr, "number of inst = %u:\n", size);
+        for (unsigned j = 1; j <= size; j++) {
+            uint32_t curr_inst = curr_seg[j];
             Um_opcode opcode = 14;
             Um_register ra = 8, rb = 8, rc = 8;
             parse_inst(&curr_inst, &opcode, &ra, &rb, &rc);
@@ -98,14 +75,25 @@ void print_um(const UM *um) {
                 fprintf(stderr, "opcode = %d,\tra = %d,\trb = %d,\trc = %d\n",
                         opcode, ra, rb, rc);
             }
-            fprintf(stderr, "*****next word*****\n");
         }
-        fprintf(stderr, "**********next segment**********\n\n");
+        fprintf(stderr, "\n**********next segment**********\n");
     }
+
+    fprintf(stderr, "\nunmapped ids:\n");
+    length = Seq_length(um->segs.unmapped_ids);
+    for (int i = 0; i < length; i++) {
+        fprintf(stderr, "%d,\t", *(int *)Seq_get(um->segs.unmapped_ids, i));
+    }
+    fprintf(stderr, "\num printed done \n\n");
 }
 
 void free_um(UM *um) {
-    Table_free(&um->segs.mem_space);
-    Seq_free  (&um->segs.unmapped_ids);
+    int length = Seq_length(um->segs.mem_space);
+    for (int i = 0; i < length; i++) {
+        free(Seq_get(um->segs.mem_space, i));
+    }
+
+    Seq_free (&um->segs.mem_space);
+    Seq_free (&um->segs.unmapped_ids);
 }
 

@@ -6,7 +6,8 @@
 
 /* struct UM is in um_operations.h */
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) 
+{
     /* Usage: ./um [file.um] */
     if (argc != 2) {
         fprintf(stderr, "Usage: ./um [file.um]\n");
@@ -23,35 +24,44 @@ int main(int argc, char *argv[]) {
     /* template done, code starts here */
     /* it is an oop idea, code inside of this block is equivalent to um.run() */
     /* Step1: read in instructions from fp */
-    uint32_t *buffer = (uint32_t *)malloc(sizeof(uint32_t));
-    size_t   num_of_inst = 0;
-    while (fread(buffer, sizeof(uint32_t), 1, fp) == 1) {
-        num_of_inst++; /* first get num of insts for easier memeory alloc */
-    }
-    assert(feof(fp)); /* check .um file has complete instuctions */
-    fseek(fp, 0, SEEK_SET); /* move the fp back to the beginning of file */
-    /* put size at the very front */
-    buffer = (uint32_t *)realloc(buffer, sizeof(uint32_t) * (num_of_inst + 1));
+    /* get the size of file and see if it has complete instructions */
+    fseek(fp, 0, SEEK_END);
+    uint32_t num_of_inst = ftell(fp);
+    assert(num_of_inst % 4 == 0);
+    num_of_inst /= 4;
+    fseek(fp, 0, SEEK_SET);
+
+    uint32_t *buffer = (uint32_t *)malloc(sizeof(uint32_t) * (num_of_inst + 1));
     if (!buffer) {
         fprintf(stderr, "Error: Memory reallocation failed.\n");
         exit(EXIT_FAILURE);
     }
     buffer[0] = num_of_inst;
-    fread(buffer + 1, sizeof(uint32_t), num_of_inst, fp);
+    for (uint32_t i = 1; i <= num_of_inst; i++) {
+        uint32_t a, b, c, d;
+        a = getc(fp);
+        b = getc(fp);
+        c = getc(fp);
+        d = getc(fp);
+        buffer[i] = (a << 24) | (b << 16) | (c << 8) | d;
+    }
     fclose(fp);
-
+    
     /* Step2: initialize um */
     UM um;
     initialize_UM(&um);
+
     /* check $m[0] is first loaded with program */
-    assert(Table_put(um.segs.mem_space, (void *)(uintptr_t)um.counter,
-                                        buffer) == NULL);
+    assert(um.segs.mem_space);
+    assert(um.segs.unmapped_ids);
+    Seq_addhi(um.segs.mem_space, buffer);
 
     /* Step3: execution cycle */
-    for (; um.counter < num_of_inst; um.counter++) {
-        /* use buffer instead of Table_get for a simpler expression */
+    for (; um.counter <= num_of_inst; um.counter++) {
+        /* use buffer instead of Seq_get for a simpler expression */
         /* reset of program ptr was done in load program block */
-        Um_instruction curr_inst = buffer[um.counter + 1];
+        Um_instruction curr_inst = buffer[um.counter];
+
         Um_opcode opcode = 14; /* opcode from 0-13, check for valid inst */
         Um_register ra = 8, rb = 8, rc = 8; /* reg from 0-7 */
         parse_inst(&curr_inst, &opcode, &ra, &rb, &rc);
@@ -77,8 +87,10 @@ int main(int argc, char *argv[]) {
             case NAND:
                 bitwise_NAND(&um, ra, rb, rc);
                 break;
-            case HALT:
-                halt();
+            case HALT:  
+                /* free everything */
+                free_um(&um);
+                return 0;
                 break;
             case ACTIVATE:
                 map_segment(&um, rb, rc);
@@ -94,11 +106,11 @@ int main(int argc, char *argv[]) {
                 break;
             case LOADP: {
                 /* since in the beginning of func cycle, we chose to use buffer 
-                instead of running Table_get $m[0], we need to update buffer and 
+                instead of running Seq_get $m[0], we need to update buffer and 
                 num_of_inst after $m[0] was replaced in load program */
                 load_program(&um, rb, rc);
                 /* the old $m[0] should've been properly freed */
-                buffer = Table_get(um.segs.mem_space, (void *)(uintptr_t)0);
+                buffer = Seq_get(um.segs.mem_space, 0);
                 break;
             }
             case LV: {
@@ -107,13 +119,11 @@ int main(int argc, char *argv[]) {
                 break;
             }
             default:
+                assert(false);
                 break;
         }
         print_um(&um);
     }
-
-    /* free everything */
-    free_um(&um);
 
     return 0;
 }

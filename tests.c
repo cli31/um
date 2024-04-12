@@ -1,5 +1,20 @@
-/* tests.c */
-/* example i commented for first test*/
+/*
+ * tests.c
+ *
+*/
+
+#include <stdint.h>
+#include <stdio.h>
+#include <assert.h>
+#include <seq.h>
+#include <bitpack.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include "assert.h"
+#include "fmt.h"
+#include "seq.h"
+
 void build_addition_test(Seq_T stream)
 {
     append(stream, loadval(r1, 5));  // Load 5 into register 1
@@ -209,6 +224,25 @@ void build_unconditional_jump_test(Seq_T stream)
     append(stream, jump(r1, r2));
 }
 
+void build_map_unmap_large(Seq_T stream)
+{
+        append(stream, loadval(r0, 15));
+        append(stream, loadval(r6, 5));
+        append(stream, loadval(r1, 1));
+        for (int j = 0; j < 5; j++)
+        {
+                for (int i = 0; i < 500; i++)
+                {
+                        append(stream, map(r2, r6));
+                }
+                for (int i = 1; i < 500; i++)
+                {
+                        append(stream, loadval(r1, i));
+                        append(stream, unmap(r1));
+                }
+        }
+        append(stream, halt());
+}
 
 /* invalid tests */
 void build_execute_unmapped_segment(Seq_T stream)
@@ -252,4 +286,12 @@ void build_dealloc_and_access(Seq_T stream)
     append(stream, sload(r2, r1, 0));
     // Attempt to load from the deallocated segment
     append(stream, halt());
+}
+
+extern void build_invalid_load_seg(Seq_T stream)
+{
+        append(stream, loadval(r0, 0));
+        append(stream, loadval(r1, 69));
+        append(stream, sload(r7, r0, r1));
+        append(stream, halt());
 }
