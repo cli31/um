@@ -63,16 +63,14 @@ typedef struct UM_segments
  * (no need to implement IO device since all the I/O's are from stdin and 
  * stdout, which can be done by using outer system)
  */
-typedef struct UM 
-{
+typedef struct UM {
         uint32_t r[num_of_regs]; /* 8 general-purpose registers, 32-bit each. */
         UM_segments segs;
         uint32_t counter;
 } UM;
 
 typedef uint32_t Um_instruction;
-typedef enum Um_opcode 
-{
+typedef enum Um_opcode {
         CMOV = 0, SLOAD, SSTORE, ADD, MUL, DIV,
         NAND, HALT, ACTIVATE, INACTIVATE, OUT, IN, LOADP, LV
 } Um_opcode;

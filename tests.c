@@ -39,7 +39,7 @@ void build_digit_print(Seq_T stream)
         append(stream, halt());
 }
 
-void build_conditional_move_test(Seq_T stream)
+void build_digit_print1(Seq_T stream)
 {
     append(stream, loadval(r1, 20));
     append(stream, loadval(r2, 0));
@@ -83,7 +83,7 @@ void build_simple_print(Seq_T stream)
 
 void build_divide(Seq_T stream)
 {
-        append(stream, loadval(r1, 202));
+        append(stream, loadval(r1, 200));
         append(stream, loadval(r2, 4));
         append(stream, divide(r3, r1, r2));
         append(stream, output(r3));

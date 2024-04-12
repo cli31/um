@@ -73,7 +73,7 @@ void segmented_load(UM *um, Um_register ra, Um_register rb, Um_register rc)
     assert(curr_seg); /* check if out of bound */
     assert(curr_seg[0] != 0); /* check if the id is unmapped */
     assert(um->r[rc] < curr_seg[0]); /* check in the range */
-    um->r[ra] = curr_seg[rc + 1]; /* size takes the 0 idx */ 
+    um->r[ra] = curr_seg[um->r[rc] + 1]; /* size takes the 0 idx */ 
 }
 
 /********** segmented_store **********
@@ -109,7 +109,7 @@ void segmented_store(UM *um, Um_register ra, Um_register rb, Um_register rc)
     assert(curr_seg); /* check if out of bound */
     assert(curr_seg[0] != 0);
     assert(um->r[rb] < curr_seg[0]); /* check in the range */
-    curr_seg[rb + 1] = um->r[rc];
+    curr_seg[um->r[rb] + 1] = um->r[rc];
 }
 
 /********** addition **********
@@ -266,7 +266,7 @@ void map_segment(UM *um, Um_register b, Um_register c)
     }
     else {
         /* use from high end like a stack */
-        int id = *(int *)Seq_remhi(um->segs.unmapped_ids);
+        int id = (int)(uintptr_t)Seq_remhi(um->segs.unmapped_ids);
         seg = (uint32_t *)Seq_get(um->segs.mem_space, id);
         seg = (uint32_t *)realloc(seg, sizeof(uint32_t) * (um->r[c] + 1));
     }
