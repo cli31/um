@@ -9,9 +9,30 @@ submit
 
 Functionality: We believe everything is in working order
 
-Design: No significant deviations from design that we can think of
+Design: We basically throw our design away bc we mistakened id in the first 
+place. Check out inline code and contracts -- they are very thorough
 
 Architecture:
+UM is composed of 8 registers, a seq_T where index is id, and elems are ptrs to
+the array of 32 bit word in memory, i.e. the memory sequence; another seq_T
+(used partial functionality as stack) stores all the unmapped id. When um 
+begins to run, it get the byte size of .um file and /4 to retrieve the number
+of instructions, assign $m[0] based on the instructions and put size at the
+front. each mem seg has size at their very front. after initialization, um goes
+into the operation cycle, runs until HALT was detected. counter indicate the
+index of instruction is run in $m[0]. we retrieve where the counter indicates,
+parse it in valid opcode, ra, rb, rc, and value, and execute the corresponding
+operations.
+Also pls refer to function/struct contracts, file header, and inline comments
+for more details
+
+50 Million Insts:
+Sandmark.umz contains 11420 insts and we finish running it in 66 seconds.
+5*10^7 / 11420 * 66 = 288966.725 seconds = approx. 80 hours
+
+Hours spent analyze: 8
+Preparing: 5
+Implement: 30
 
 UMTESTS:
 add.um
@@ -152,7 +173,8 @@ we removed them from our code after
 build_execute_unmapped_segment: Tries to execute from an unmapped segment.
 build_out_of_bounds_access: Attempts to access memory outside segment bounds.
 build_div_nonzero_by_zero: Tests division by zero handling.
-build_invalid_instruction: Tries to execute an invalid or undefined instruction.
+build_invalid_instruction: Tries to execute an invalid or undefined 
+instruction.
 build_dealloc_and_access: Attempts to access a segment after deallocating it.
 
 Hours Spent: 5 hours analyzing, 2 hours preparing, 20 after analysis = 27 total

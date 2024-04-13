@@ -48,7 +48,8 @@
  *      index      id
  *      value      pointer --> sequence of 32 bit words
  *                               size    0th     1th     2th     ...
- * By using this structure, 32 bit id can be used to indicate the 64 bit address
+ * By using this structure, 32 bit id can be used to indicate the 64 bit 
+ * address
  *
  * unmapped_id (Seq_T):
  *      used as a stack: first in last out; use the lastly freed id.
@@ -72,7 +73,7 @@ typedef struct UM_segments
  * stdout, which can be done by using outer system)
  */
 typedef struct UM {
-        uint32_t r[num_of_regs]; /* 8 general-purpose registers, 32-bit each. */
+        uint32_t r[num_of_regs]; /* 8 general-purpose registers, 32-bit each.*/
         UM_segments segs;
         uint32_t counter;
 } UM;

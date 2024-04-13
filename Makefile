@@ -64,5 +64,8 @@ all: um
 um: um.o um_operations.o um_components.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
+writetests: umlabwrite.o umlab.o
+	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
+
 clean:
 	rm -f *.o

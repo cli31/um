@@ -323,7 +323,7 @@ void build_load_program(Seq_T stream)
         append(stream, loadval(r1, 0));
         append(stream, loadval(r2, 5));
         append(stream, loadval(r7, 6));
-        append(stream, loadval(r6, 12));
+        append(stream, loadval(r6, 1));
         append(stream, map(r3, r0));
         append(stream, sload(r4, r1, r2));
         append(stream, sload(r5, r1, r2));
@@ -333,7 +333,6 @@ void build_load_program(Seq_T stream)
         append(stream, loadp(r6, r1));
         append(stream, output(r0));
         append(stream, halt());
-
 }
 
 void build_read_nand(Seq_T stream)

@@ -1,12 +1,9 @@
 add.um
-build_bitwise_nand_test.um
 build_cmove_move.um
 build_digit_print.um
-build_div_O.um
 build_divide.um
 build_in_out.um
 build_input_handling_test.um
-build_load_program.um
 build_map_unmap_large.um
 build_map_unmap_loop.um
 build_map_unmap.um
