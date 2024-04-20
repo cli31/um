@@ -51,14 +51,14 @@ void parse_inst(Um_instruction *curr_inst, Um_opcode *opcode, Um_register *ra,
         if (*opcode == 13) {
                 (void)rb;
                 (void)rc;
-                *ra = Bitpack_getu(*curr_inst, 3, 25);
+                *ra = ((*curr_inst) >> 25) & 0x7;
                 /* no need to assert since 3 bits are already 0-7 */
                 /* value will be parsed */
         }
         else {
-                *ra = Bitpack_getu(*curr_inst, 3, 6);
-                *rb = Bitpack_getu(*curr_inst, 3, 3);
-                *rc = Bitpack_getu(*curr_inst, 3, 0);
+                *ra = ((*curr_inst) >> 6) & 0x7;
+                *rb = ((*curr_inst) >> 3) & 0x7;
+                *rc = ((*curr_inst)     ) & 0x7;
         }
 }
 
