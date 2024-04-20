@@ -52,19 +52,17 @@ int main(int argc, char *argv[])
         /* check $m[0] is first loaded with program */
         assert(um.segs.mem_space);
         assert(um.segs.unmapped_ids);
-        Seq_addhi(um.segs.mem_space, buffer);        
+        Seq_addhi(um.segs.mem_space, buffer);
+
         /* Step3: execution cycle */
+        Um_register ra, rb, rc;
         for ( ;; um.counter++) {
                 /* use buffer instead of Seq_get for a simpler expression */
                 /* reset of program ptr was done in load program block */
                 Um_instruction curr_inst = buffer[um.counter];
-                /* opcode from 0-13, check for valid inst */
-                Um_opcode opcode = 14;
-                Um_register ra = 8, rb = 8, rc = 8; /* reg from 0-7 */
-                parse_inst(&curr_inst, &opcode, &ra, &rb, &rc);
-                switch (opcode) {
+                switch (parse_inst(&curr_inst, &ra, &rb, &rc)) {
                 case CMOV:
-                            conditional_move(&um, ra, rb, rc);
+                        conditional_move(&um, ra, rb, rc);
                         break;
                 case SLOAD:
                         segmented_load(&um, ra, rb, rc);

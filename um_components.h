@@ -86,8 +86,8 @@ typedef enum Um_opcode {
 typedef enum Um_register { r0 = 0, r1, r2, r3, r4, r5, r6, r7 } Um_register;
 
 /* helper functions */
-void parse_inst(Um_instruction *curr_inst, Um_opcode *opcode, Um_register *ra,
-                Um_register *rb, Um_register *rc);
+int parse_inst(Um_instruction *curr_inst,
+               Um_register *ra, Um_register *rb, Um_register *rc);
 
 void initialize_UM(UM *um);
 

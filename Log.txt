@@ -13,7 +13,9 @@ performance:
 performance:
 3. Move register index ra, rb, rc global. We intend to make compiler put them in
 registers. If performance not changed, it means ra, rb, rc was already put in
-regs. Then no more optimization possible. TODO: performance test.
-4. Remove opcode, but let parse_line return it and immediately used in switch.
+regs. Then no more optimization possible. 
+performance:
+3.5. Remove opcode, but let parse_line return it and immediately used in switch.
 So technically, one conversion between lvalve to rvalve can be reduced to speed
-up. TODO: performance test
+up. 
+performance:
