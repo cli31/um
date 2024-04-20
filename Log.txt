@@ -1,0 +1,14 @@
+Work log of um optimization
+
+
+1. Debug: since size 0 is possible, in unmapp segs, we have no invalid
+indicator to use. We then dealloc the memory and use judge of NULL ptr in
+other operations to see if segs are ummapped (instead of iterate through ummap
+ids) TODO: performance test. (it is possibly worse)
+2. Optimize usage of bitpack.c in parse_line.              2.67 -> 2.4
+3. Move register index ra, rb, rc global. We intend to make compiler put them in
+registers. If performance not changed, it means ra, rb, rc was already put in
+regs. Then no more optimization possible. TODO: performance test.
+4. Remove opcode, but let parse_line return it and immediately used in switch.
+So technically, one conversion between lvalve to rvalve can be reduced to speed
+up. TODO: performance test
