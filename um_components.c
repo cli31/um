@@ -108,9 +108,8 @@ void initialize_UM(UM *um)
  *        space.
  *      - Frees the sequences that manage the memory space and the 
  *        sequence of unmapped segment identifiers.
- *                - After executing this function, the UM instance and its 
- *              memory
- *                  structures are no longer valid and should not be used.
+ *      - After executing this function, the UM instance and its 
+ *        memory structures are no longer valid and should not be used.
  ******************************/
 void free_um(UM *um)
 {
