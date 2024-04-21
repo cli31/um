@@ -1,16 +1,11 @@
 Work log of um optimization
 
+
 1. Debug: since size 0 is possible, in unmapp segs, we have no invalid
 indicator to use. We then dealloc the memory and use judge of NULL ptr in
 other operations to see if segs are ummapped (instead of iterate through ummap
-ids, which will be O(n)).
-Additionally, we get rid of unneeded assert since Seq_get will do 
-the bound check for us, and subsequently update if mapped asserts.
-TODO: performance test. (it is possibly worse)
-1.5. Run in O1 and O2
-performance:
-2. Remove usage of bitpack.c by using unboxed bit move in parse_line.
-performance:
+ids) TODO: performance test. (it is possibly worse)
+2. Optimize usage of bitpack.c in parse_line.              2.67 -> 2.4
 3. Move register index ra, rb, rc global. We intend to make compiler put them in
 registers. If performance not changed, it means ra, rb, rc was already put in
 regs. Then no more optimization possible. 
