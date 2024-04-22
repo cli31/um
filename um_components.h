@@ -14,13 +14,8 @@
 #define UM_COMPONENTS_H
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
 #include <stdbool.h>
-#include <assert.h>
-
-#include <seq.h>
+#include "my_seq.h"
 
 #define HINT 1000 /* estimated number of segments */
 #define num_of_regs 8
@@ -85,9 +80,6 @@ typedef enum Um_opcode {
 typedef enum Um_register { r0 = 0, r1, r2, r3, r4, r5, r6, r7 } Um_register;
 
 /* helper functions */
-int parse_inst(Um_instruction *curr_inst,
-               Um_register *ra, Um_register *rb, Um_register *rc);
-
 void initialize_UM(UM *um);
 
 /* used for debugging -- print out the machine to stderr */

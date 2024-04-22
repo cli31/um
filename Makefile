@@ -37,7 +37,8 @@ LDFLAGS = -g -L/comp/40/build/lib -L/usr/sup/cii40/lib64
 # um-dis and cii contains necessary provided files 
 # cii and cii40 both exists; so both included for easier usage
 # rt is for the "real time" timing library, which contains the clock support
-LDLIBS = -lcii40 -l40locality -lum-dis -lcii -lm -lrt
+# LDLIBS = -lcii40 -l40locality -lum-dis -lcii -lm -lrt
+LDLIBS = -lcii40 -lum-dis -lcii
 
 # Collect all .h files in your directory.
 # This way, you can never forget to add
@@ -62,6 +63,9 @@ all: um
 ## Linking step (.o -> executable program)
 
 um: um.o um_operations.o um_components.o
+	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
+
+Seq_test: Seq_test.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 writetests: umlabwrite.o umlab.o

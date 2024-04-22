@@ -38,26 +38,26 @@
  *      - Extracts the opcode and registers from curr_inst.
  *      - Populates opcode, ra, rb, and rc with the extracted values.
  ******************************/
-int parse_inst(Um_instruction *curr_inst, 
-               Um_register *ra, Um_register *rb, Um_register *rc)
-{
-        int opcode = (*curr_inst) >> 28;
-        assert(opcode >= 0 && opcode <= 13);
+// int parse_inst(Um_instruction *curr_inst, 
+//                Um_register *ra, Um_register *rb, Um_register *rc)
+// {
+//         int opcode = (*curr_inst) >> 28;
+//         assert(opcode >= 0 && opcode <= 13);
 
-        if (opcode == 13) {
-                (void)rb;
-                (void)rc;
-                *ra = ((*curr_inst) >> 25) & 0x7;
-                /* no need to assert since 3 bits are already 0-7 */
-                /* value will be parsed */
-        }
-        else {
-                *ra = ((*curr_inst) >> 6) & 0x7;
-                *rb = ((*curr_inst) >> 3) & 0x7;
-                *rc = ((*curr_inst)     ) & 0x7;
-        }
-        return opcode;
-}
+//         if (opcode == 13) {
+//                 (void)rb;
+//                 (void)rc;
+//                 *ra = ((*curr_inst) >> 25) & 0x7;
+//                 /* no need to assert since 3 bits are already 0-7 */
+//                 /* value will be parsed */
+//         }
+//         else {
+//                 *ra = ((*curr_inst) >> 6) & 0x7;
+//                 *rb = ((*curr_inst) >> 3) & 0x7;
+//                 *rc = ((*curr_inst)     ) & 0x7;
+//         }
+//         return opcode;
+// }
 
 /********** initialize_UM **********
  * Initializes um by setting all registers to 0, setting up memory management
