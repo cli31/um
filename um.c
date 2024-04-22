@@ -4,6 +4,17 @@
  */
 #include "um_operations.h"
 
+#define N (curr_inst)
+#define opcode (N >> 28)
+#define A (((N) >> 6) & 0x7)
+#define B (((N) >> 3) & 0x7)
+#define C ((N)        & 0x7)
+#define RA (um.r[A])
+#define RB (um.r[B])
+#define RC (um.r[C])
+#define value ((N << 7) >> 7)
+#define Rvalue (um.r[(N >> 25) & 0x7])
+
 /* struct UM is in um_operations.h */
 
 int main(int argc, char *argv[]) 
@@ -12,14 +23,14 @@ int main(int argc, char *argv[])
         if (argc != 2) {
         fprintf(stderr, "Usage: ./um [file.um]\n");
         exit(EXIT_FAILURE);
-}
+        }
         FILE *fp = fopen(argv[1], "rb");
         if (!fp) {
         fprintf(stderr, 
                 "Error: Cannot open file '%s' for reading.\n", 
                 argv[argc - 1]);
         exit(EXIT_FAILURE);
-}
+        }
         /* template done, code starts here */
         /* it is an oop idea, code inside of this block is equivalent to 
         um.run() */
@@ -55,62 +66,78 @@ int main(int argc, char *argv[])
         Seq_addhi(um.segs.mem_space, buffer);
 
         /* Step3: execution cycle */
-        Um_register ra, rb, rc;
+        Um_instruction curr_inst;
         for ( ;; um.counter++) {
                 /* use buffer instead of Seq_get for a simpler expression */
                 /* reset of program ptr was done in load program block */
-                Um_instruction curr_inst = buffer[um.counter];
-                switch (parse_inst(&curr_inst, &ra, &rb, &rc)) {
+                curr_inst = buffer[um.counter];
+                switch (opcode) {
                 case CMOV:
-                        conditional_move(&um, ra, rb, rc);
+                        if (RC != 0) {
+                                RA = RB;
+                        }
+                        //conditional_move(&um, ra, rb, rc);
                         break;
                 case SLOAD:
-                        segmented_load(&um, ra, rb, rc);
+                        segmented_load(&um, A, B, C);
                         break;
                 case SSTORE:
-                        segmented_store(&um, ra, rb, rc);
+                        segmented_store(&um, A, B, C);
                         break;
                 case ADD:
-                        addition(&um, ra, rb, rc);
+                        RA = RB + RC;
+                        //addition(&um, ra, rb, rc);
                         break;
                 case MUL:
-                        multiplication(&um, ra, rb, rc);
+                        RA = RB * RC;
+                        //multiplication(&um, ra, rb, rc);
                         break;
                 case DIV:
-                        division(&um, ra, rb, rc);
+                        RA = RB / RC;
+                        //division(&um, ra, rb, rc);
                         break;
                 case NAND:
-                        bitwise_NAND(&um, ra, rb, rc);
+                        RA = ~(RB & RC);
+                        //bitwise_NAND(&um, ra, rb, rc);
                         break;
                 case HALT:  
                         /* free everything */
                         free_um(&um);
                         return 0;
                 case ACTIVATE:
-                        map_segment(&um, rb, rc);
+                        map_segment(&um, B, C);
                         break;
                 case INACTIVATE:
-                        unmap_segment(&um, rc);
+                        unmap_segment(&um, C);
                         break;
                 case OUT:
-                        output(&um, rc);
+                        assert (RC <= 255);
+                        putchar((char)RC);
+                        //output(&um, rc);
                         break;
-                case IN:
-                        input(&um, rc);
+                case IN: {
+                        int input = fgetc(stdin);
+                        if (input != EOF) {
+                                assert(0 <= input && input <= 255);
+                                RC = input;
+                        } else {
+                                RC = -1;
+                        }
+                        //input(&um, rc);
                         break;
+                }
                 case LOADP: {
                         /* since in the beginning of func cycle, we chose to 
                         use buffer instead of running Seq_get $m[0], we need 
                         to update buffer and num_of_inst after $m[0] was 
                         replaced in load program */
-                        load_program(&um, rb, rc);
+                        load_program(&um, B, C);
                         /* the old $m[0] should've been properly freed */
                         buffer = (uint32_t *)Seq_get(um.segs.mem_space, 0);
                         break;
                 }
                 case LV: {
-                        uint32_t value = (curr_inst << 7) >> 7;
-                        load_value(&um, ra, value);
+                        Rvalue = value;
                         break;
                 }
                 default:

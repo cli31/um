@@ -17,10 +17,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include <bitpack.h>
+#include <stdbool.h>
 #include <assert.h>
 
-#include <table.h>
 #include <seq.h>
 
 #define HINT 1000 /* estimated number of segments */

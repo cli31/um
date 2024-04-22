@@ -29,19 +29,20 @@
  *      operation to perform and the operands on which to perform it. It is
  *      parsed to execute the corresponding action in the UM.
  ******************************/
-void conditional_move(UM *um, Um_register ra, Um_register rb, Um_register rc);
-void segmented_load(UM *um, Um_register ra, Um_register rb, Um_register rc);
-void segmented_store(UM *um, Um_register ra, Um_register rb, Um_register rc);
-void addition(UM *um, Um_register ra, Um_register rb, Um_register rc);
-void multiplication(UM *um, Um_register ra, Um_register rb, Um_register rc);
-void division(UM *um, Um_register ra, Um_register rb, Um_register rc);
-void bitwise_NAND(UM *um, Um_register a, Um_register b, Um_register c);
-void halt(void);
+// void conditional_move(UM *um, Um_register ra, Um_register rb, Um_register rc);
+void segmented_load(UM *um, Um_register ra, Um_register rb, 
+                                                   Um_register rc);
+void segmented_store(UM *um, Um_register ra, Um_register rb, 
+                                                    Um_register rc);
+// void addition(UM *um, Um_register ra, Um_register rb, Um_register rc);
+// void multiplication(UM *um, Um_register ra, Um_register rb, Um_register rc);
+// void division(UM *um, Um_register ra, Um_register rb, Um_register rc);
+// void bitwise_NAND(UM *um, Um_register a, Um_register b, Um_register c);
 void map_segment(UM *um, Um_register b, Um_register c);
 void unmap_segment(UM *um, Um_register c);
-void output(UM *um, Um_register c);
-void input(UM *um, Um_register c);
+//void output(UM *um, Um_register c);
+//void input(UM *um, Um_register c);
 void load_program(UM *um, Um_register b, Um_register c);
-void load_value(UM *um, Um_register a, uint32_t value);
+//void load_value(UM *um, Um_register a, uint32_t value);
 
 #endif
