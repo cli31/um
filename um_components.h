@@ -13,8 +13,7 @@
 #ifndef UM_COMPONENTS_H
 #define UM_COMPONENTS_H
 
-#include <stdio.h>
-#include <stdbool.h>
+
 #include "my_seq.h"
 
 #define HINT 1000 /* estimated number of segments */

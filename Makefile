@@ -10,7 +10,7 @@
 
 ############## Variables ###############
 
-CC = gcc # The compiler being used
+CC = gcc -O2 # The compiler being used
 
 # Updating include path to use Comp 40 .h files and CII interfaces
 IFLAGS = -I/comp/40/build/include -I/usr/sup/cii40/include/cii
@@ -38,7 +38,7 @@ LDFLAGS = -g -L/comp/40/build/lib -L/usr/sup/cii40/lib64
 # cii and cii40 both exists; so both included for easier usage
 # rt is for the "real time" timing library, which contains the clock support
 # LDLIBS = -lcii40 -l40locality -lum-dis -lcii -lm -lrt
-LDLIBS = -lcii40 -lum-dis -lcii
+LDLIBS = -lcii40-O2 -lum-dis -lcii
 
 # Collect all .h files in your directory.
 # This way, you can never forget to add
@@ -62,10 +62,7 @@ all: um
 
 ## Linking step (.o -> executable program)
 
-um: um.o um_operations.o um_components.o
-	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
-
-Seq_test: Seq_test.o
+um: um.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 writetests: umlabwrite.o umlab.o
